@@ -1,0 +1,41 @@
+
+syntax = "proto3";
+
+package chat;
+
+
+service ChatService {
+  rpc GetUsersStatus (GetUsersStatusRequest)
+      returns (GetUsersStatusResponse);
+
+  rpc SendMessage (SendMessageRequest)
+      returns (SendMessageResponse);
+}
+
+
+message GetUsersStatusRequest {
+}
+
+message UserStatus {
+  int32 user_id = 1;
+  string username = 2;
+  string display_name = 3;
+  bool is_online = 4;
+  string last_seen = 5;
+}
+
+message GetUsersStatusResponse {
+  repeated UserStatus users = 1;
+}
+
+message SendMessageRequest {
+  int32 conversation_id = 1;
+  int32 sender_id = 2;
+  string content = 3;
+}
+
+message SendMessageResponse {
+  bool success = 1;
+  string message = 2;
+  int32 message_id = 3;
+}
