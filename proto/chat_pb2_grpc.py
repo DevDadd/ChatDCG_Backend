@@ -44,6 +44,16 @@ class ChatServiceStub:
                 request_serializer=proto_dot_chat__pb2.SendMessageRequest.SerializeToString,
                 response_deserializer=proto_dot_chat__pb2.SendMessageResponse.FromString,
                 _registered_method=True)
+        self.SendTypingStatus = channel.unary_unary(
+                '/chat.ChatService/SendTypingStatus',
+                request_serializer=proto_dot_chat__pb2.SendTypingStatusRequest.SerializeToString,
+                response_deserializer=proto_dot_chat__pb2.SendTypingStatusResponse.FromString,
+                _registered_method=True)
+        self.SubscribeTyping = channel.unary_stream(
+                '/chat.ChatService/SubscribeTyping',
+                request_serializer=proto_dot_chat__pb2.SubscribeTypingRequest.SerializeToString,
+                response_deserializer=proto_dot_chat__pb2.TypingEvent.FromString,
+                _registered_method=True)
 
 
 class ChatServiceServicer:
@@ -61,6 +71,18 @@ class ChatServiceServicer:
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SendTypingStatus(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SubscribeTyping(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ChatServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -73,6 +95,16 @@ def add_ChatServiceServicer_to_server(servicer, server):
                     servicer.SendMessage,
                     request_deserializer=proto_dot_chat__pb2.SendMessageRequest.FromString,
                     response_serializer=proto_dot_chat__pb2.SendMessageResponse.SerializeToString,
+            ),
+            'SendTypingStatus': grpc.unary_unary_rpc_method_handler(
+                    servicer.SendTypingStatus,
+                    request_deserializer=proto_dot_chat__pb2.SendTypingStatusRequest.FromString,
+                    response_serializer=proto_dot_chat__pb2.SendTypingStatusResponse.SerializeToString,
+            ),
+            'SubscribeTyping': grpc.unary_stream_rpc_method_handler(
+                    servicer.SubscribeTyping,
+                    request_deserializer=proto_dot_chat__pb2.SubscribeTypingRequest.FromString,
+                    response_serializer=proto_dot_chat__pb2.TypingEvent.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -129,6 +161,60 @@ class ChatService:
             '/chat.ChatService/SendMessage',
             proto_dot_chat__pb2.SendMessageRequest.SerializeToString,
             proto_dot_chat__pb2.SendMessageResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SendTypingStatus(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/chat.ChatService/SendTypingStatus',
+            proto_dot_chat__pb2.SendTypingStatusRequest.SerializeToString,
+            proto_dot_chat__pb2.SendTypingStatusResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SubscribeTyping(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(
+            request,
+            target,
+            '/chat.ChatService/SubscribeTyping',
+            proto_dot_chat__pb2.SubscribeTypingRequest.SerializeToString,
+            proto_dot_chat__pb2.TypingEvent.FromString,
             options,
             channel_credentials,
             insecure,

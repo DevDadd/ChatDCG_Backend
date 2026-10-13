@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10proto/chat.proto\x12\x04\x63hat\"\x17\n\x15GetUsersStatusRequest\"k\n\nUserStatus\x12\x0f\n\x07user_id\x18\x01 \x01(\x05\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x03 \x01(\t\x12\x11\n\tis_online\x18\x04 \x01(\x08\x12\x11\n\tlast_seen\x18\x05 \x01(\t\"9\n\x16GetUsersStatusResponse\x12\x1f\n\x05users\x18\x01 \x03(\x0b\x32\x10.chat.UserStatus\"Q\n\x12SendMessageRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x05\x12\x11\n\tsender_id\x18\x02 \x01(\x05\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\"K\n\x13SendMessageResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x12\n\nmessage_id\x18\x03 \x01(\x05\x32\x9e\x01\n\x0b\x43hatService\x12K\n\x0eGetUsersStatus\x12\x1b.chat.GetUsersStatusRequest\x1a\x1c.chat.GetUsersStatusResponse\x12\x42\n\x0bSendMessage\x12\x18.chat.SendMessageRequest\x1a\x19.chat.SendMessageResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10proto/chat.proto\x12\x04\x63hat\"\x17\n\x15GetUsersStatusRequest\"k\n\nUserStatus\x12\x0f\n\x07user_id\x18\x01 \x01(\x05\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x03 \x01(\t\x12\x11\n\tis_online\x18\x04 \x01(\x08\x12\x11\n\tlast_seen\x18\x05 \x01(\t\"9\n\x16GetUsersStatusResponse\x12\x1f\n\x05users\x18\x01 \x03(\x0b\x32\x10.chat.UserStatus\"Q\n\x12SendMessageRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x05\x12\x11\n\tsender_id\x18\x02 \x01(\x05\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\"K\n\x13SendMessageResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x12\n\nmessage_id\x18\x03 \x01(\x05\"V\n\x17SendTypingStatusRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x05\x12\x0f\n\x07user_id\x18\x02 \x01(\x05\x12\x11\n\tis_typing\x18\x03 \x01(\x08\"+\n\x18SendTypingStatusResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"B\n\x16SubscribeTypingRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x05\x12\x0f\n\x07user_id\x18\x02 \x01(\x05\"\x85\x01\n\x0bTypingEvent\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x05\x12\x0f\n\x07user_id\x18\x02 \x01(\x05\x12\x10\n\x08username\x18\x03 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x04 \x01(\t\x12\x11\n\tis_typing\x18\x05 \x01(\x08\x12\x11\n\ttimestamp\x18\x06 \x01(\t2\xb7\x02\n\x0b\x43hatService\x12K\n\x0eGetUsersStatus\x12\x1b.chat.GetUsersStatusRequest\x1a\x1c.chat.GetUsersStatusResponse\x12\x42\n\x0bSendMessage\x12\x18.chat.SendMessageRequest\x1a\x19.chat.SendMessageResponse\x12Q\n\x10SendTypingStatus\x12\x1d.chat.SendTypingStatusRequest\x1a\x1e.chat.SendTypingStatusResponse\x12\x44\n\x0fSubscribeTyping\x12\x1c.chat.SubscribeTypingRequest\x1a\x11.chat.TypingEvent0\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -41,6 +41,14 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_SENDMESSAGEREQUEST']._serialized_end=300
   _globals['_SENDMESSAGERESPONSE']._serialized_start=302
   _globals['_SENDMESSAGERESPONSE']._serialized_end=377
-  _globals['_CHATSERVICE']._serialized_start=380
-  _globals['_CHATSERVICE']._serialized_end=538
+  _globals['_SENDTYPINGSTATUSREQUEST']._serialized_start=379
+  _globals['_SENDTYPINGSTATUSREQUEST']._serialized_end=465
+  _globals['_SENDTYPINGSTATUSRESPONSE']._serialized_start=467
+  _globals['_SENDTYPINGSTATUSRESPONSE']._serialized_end=510
+  _globals['_SUBSCRIBETYPINGREQUEST']._serialized_start=512
+  _globals['_SUBSCRIBETYPINGREQUEST']._serialized_end=578
+  _globals['_TYPINGEVENT']._serialized_start=581
+  _globals['_TYPINGEVENT']._serialized_end=714
+  _globals['_CHATSERVICE']._serialized_start=717
+  _globals['_CHATSERVICE']._serialized_end=1028
 # @@protoc_insertion_point(module_scope)

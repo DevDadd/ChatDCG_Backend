@@ -10,6 +10,12 @@ service ChatService {
 
   rpc SendMessage (SendMessageRequest)
       returns (SendMessageResponse);
+
+  rpc SendTypingStatus (SendTypingStatusRequest)
+      returns (SendTypingStatusResponse);
+
+  rpc SubscribeTyping (SubscribeTypingRequest)
+      returns (stream TypingEvent);
 }
 
 
@@ -38,4 +44,28 @@ message SendMessageResponse {
   bool success = 1;
   string message = 2;
   int32 message_id = 3;
+}
+
+message SendTypingStatusRequest {
+  int32 conversation_id = 1;
+  int32 user_id = 2;
+  bool is_typing = 3;
+}
+
+message SendTypingStatusResponse {
+  bool success = 1;
+}
+
+message SubscribeTypingRequest {
+  int32 conversation_id = 1;
+  int32 user_id = 2;
+}
+
+message TypingEvent {
+  int32 conversation_id = 1;
+  int32 user_id = 2;
+  string username = 3;
+  string display_name = 4;
+  bool is_typing = 5;
+  string timestamp = 6;
 }
