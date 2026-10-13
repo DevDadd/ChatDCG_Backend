@@ -54,6 +54,21 @@ class ChatServiceStub:
                 request_serializer=proto_dot_chat__pb2.SubscribeTypingRequest.SerializeToString,
                 response_deserializer=proto_dot_chat__pb2.TypingEvent.FromString,
                 _registered_method=True)
+        self.StreamMessages = channel.unary_stream(
+                '/chat.ChatService/StreamMessages',
+                request_serializer=proto_dot_chat__pb2.StreamMessagesRequest.SerializeToString,
+                response_deserializer=proto_dot_chat__pb2.ChatMessage.FromString,
+                _registered_method=True)
+        self.SyncMessages = channel.stream_unary(
+                '/chat.ChatService/SyncMessages',
+                request_serializer=proto_dot_chat__pb2.SendMessageRequest.SerializeToString,
+                response_deserializer=proto_dot_chat__pb2.SyncMessagesResponse.FromString,
+                _registered_method=True)
+        self.Chat = channel.stream_stream(
+                '/chat.ChatService/Chat',
+                request_serializer=proto_dot_chat__pb2.ChatClientMessage.SerializeToString,
+                response_deserializer=proto_dot_chat__pb2.ChatMessage.FromString,
+                _registered_method=True)
 
 
 class ChatServiceServicer:
@@ -83,6 +98,24 @@ class ChatServiceServicer:
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def StreamMessages(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SyncMessages(self, request_iterator, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def Chat(self, request_iterator, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ChatServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -105,6 +138,21 @@ def add_ChatServiceServicer_to_server(servicer, server):
                     servicer.SubscribeTyping,
                     request_deserializer=proto_dot_chat__pb2.SubscribeTypingRequest.FromString,
                     response_serializer=proto_dot_chat__pb2.TypingEvent.SerializeToString,
+            ),
+            'StreamMessages': grpc.unary_stream_rpc_method_handler(
+                    servicer.StreamMessages,
+                    request_deserializer=proto_dot_chat__pb2.StreamMessagesRequest.FromString,
+                    response_serializer=proto_dot_chat__pb2.ChatMessage.SerializeToString,
+            ),
+            'SyncMessages': grpc.stream_unary_rpc_method_handler(
+                    servicer.SyncMessages,
+                    request_deserializer=proto_dot_chat__pb2.SendMessageRequest.FromString,
+                    response_serializer=proto_dot_chat__pb2.SyncMessagesResponse.SerializeToString,
+            ),
+            'Chat': grpc.stream_stream_rpc_method_handler(
+                    servicer.Chat,
+                    request_deserializer=proto_dot_chat__pb2.ChatClientMessage.FromString,
+                    response_serializer=proto_dot_chat__pb2.ChatMessage.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -215,6 +263,87 @@ class ChatService:
             '/chat.ChatService/SubscribeTyping',
             proto_dot_chat__pb2.SubscribeTypingRequest.SerializeToString,
             proto_dot_chat__pb2.TypingEvent.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def StreamMessages(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(
+            request,
+            target,
+            '/chat.ChatService/StreamMessages',
+            proto_dot_chat__pb2.StreamMessagesRequest.SerializeToString,
+            proto_dot_chat__pb2.ChatMessage.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SyncMessages(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_unary(
+            request_iterator,
+            target,
+            '/chat.ChatService/SyncMessages',
+            proto_dot_chat__pb2.SendMessageRequest.SerializeToString,
+            proto_dot_chat__pb2.SyncMessagesResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def Chat(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_stream(
+            request_iterator,
+            target,
+            '/chat.ChatService/Chat',
+            proto_dot_chat__pb2.ChatClientMessage.SerializeToString,
+            proto_dot_chat__pb2.ChatMessage.FromString,
             options,
             channel_credentials,
             insecure,

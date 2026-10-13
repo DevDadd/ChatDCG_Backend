@@ -16,6 +16,15 @@ service ChatService {
 
   rpc SubscribeTyping (SubscribeTypingRequest)
       returns (stream TypingEvent);
+
+  rpc StreamMessages (StreamMessagesRequest)
+      returns (stream ChatMessage);
+
+  rpc SyncMessages (stream SendMessageRequest)
+      returns (SyncMessagesResponse);
+
+  rpc Chat (stream ChatClientMessage)
+      returns (stream ChatMessage);
 }
 
 
@@ -68,4 +77,30 @@ message TypingEvent {
   string display_name = 4;
   bool is_typing = 5;
   string timestamp = 6;
+}
+
+message ChatMessage {
+  int32 message_id = 1;
+  int32 conversation_id = 2;
+  int32 sender_id = 3;
+  string sender_name = 4;
+  string content = 5;
+  string timestamp = 6;
+}
+
+message StreamMessagesRequest {
+  int32 conversation_id = 1;
+  int32 user_id = 2;
+}
+
+message SyncMessagesResponse {
+  int32 received_count = 1;
+  int32 failed_count = 2;
+  string message = 3;
+}
+
+message ChatClientMessage {
+  int32 conversation_id = 1;
+  int32 sender_id = 2;
+  string content = 3;
 }
