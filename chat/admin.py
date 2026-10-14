@@ -11,8 +11,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Conversation)
 class ConversationAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "created_at")
-    filter_horizontal = ("participants",)
+    list_display = ("id", "user1", "user2", "created_at")
 
 
 @admin.register(Message)

@@ -32,7 +32,7 @@ message GetUsersStatusRequest {
 }
 
 message UserStatus {
-  int32 user_id = 1;
+  int64 user_id = 1;
   string username = 2;
   string display_name = 3;
   bool is_online = 4;
@@ -44,20 +44,23 @@ message GetUsersStatusResponse {
 }
 
 message SendMessageRequest {
-  int32 conversation_id = 1;
-  int32 sender_id = 2;
+  int64 conversation_id = 1;
+  int64 sender_id = 2;
   string content = 3;
+  // Unix ms when the user wrote the message; used by SyncMessages so offline
+  // messages keep their original order. 0 = use server time.
+  int64 client_timestamp_ms = 4;
 }
 
 message SendMessageResponse {
   bool success = 1;
   string message = 2;
-  int32 message_id = 3;
+  int64 message_id = 3;
 }
 
 message SendTypingStatusRequest {
-  int32 conversation_id = 1;
-  int32 user_id = 2;
+  int64 conversation_id = 1;
+  int64 user_id = 2;
   bool is_typing = 3;
 }
 
@@ -66,13 +69,13 @@ message SendTypingStatusResponse {
 }
 
 message SubscribeTypingRequest {
-  int32 conversation_id = 1;
-  int32 user_id = 2;
+  int64 conversation_id = 1;
+  int64 user_id = 2;
 }
 
 message TypingEvent {
-  int32 conversation_id = 1;
-  int32 user_id = 2;
+  int64 conversation_id = 1;
+  int64 user_id = 2;
   string username = 3;
   string display_name = 4;
   bool is_typing = 5;
@@ -80,17 +83,17 @@ message TypingEvent {
 }
 
 message ChatMessage {
-  int32 message_id = 1;
-  int32 conversation_id = 2;
-  int32 sender_id = 3;
+  int64 message_id = 1;
+  int64 conversation_id = 2;
+  int64 sender_id = 3;
   string sender_name = 4;
   string content = 5;
   string timestamp = 6;
 }
 
 message StreamMessagesRequest {
-  int32 conversation_id = 1;
-  int32 user_id = 2;
+  int64 conversation_id = 1;
+  int64 user_id = 2;
 }
 
 message SyncMessagesResponse {
@@ -100,7 +103,7 @@ message SyncMessagesResponse {
 }
 
 message ChatClientMessage {
-  int32 conversation_id = 1;
-  int32 sender_id = 2;
+  int64 conversation_id = 1;
+  int64 sender_id = 2;
   string content = 3;
 }

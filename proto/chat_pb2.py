@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10proto/chat.proto\x12\x04\x63hat\"\x17\n\x15GetUsersStatusRequest\"k\n\nUserStatus\x12\x0f\n\x07user_id\x18\x01 \x01(\x05\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x03 \x01(\t\x12\x11\n\tis_online\x18\x04 \x01(\x08\x12\x11\n\tlast_seen\x18\x05 \x01(\t\"9\n\x16GetUsersStatusResponse\x12\x1f\n\x05users\x18\x01 \x03(\x0b\x32\x10.chat.UserStatus\"Q\n\x12SendMessageRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x05\x12\x11\n\tsender_id\x18\x02 \x01(\x05\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\"K\n\x13SendMessageResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x12\n\nmessage_id\x18\x03 \x01(\x05\"V\n\x17SendTypingStatusRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x05\x12\x0f\n\x07user_id\x18\x02 \x01(\x05\x12\x11\n\tis_typing\x18\x03 \x01(\x08\"+\n\x18SendTypingStatusResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"B\n\x16SubscribeTypingRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x05\x12\x0f\n\x07user_id\x18\x02 \x01(\x05\"\x85\x01\n\x0bTypingEvent\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x05\x12\x0f\n\x07user_id\x18\x02 \x01(\x05\x12\x10\n\x08username\x18\x03 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x04 \x01(\t\x12\x11\n\tis_typing\x18\x05 \x01(\x08\x12\x11\n\ttimestamp\x18\x06 \x01(\t\"\x86\x01\n\x0b\x43hatMessage\x12\x12\n\nmessage_id\x18\x01 \x01(\x05\x12\x17\n\x0f\x63onversation_id\x18\x02 \x01(\x05\x12\x11\n\tsender_id\x18\x03 \x01(\x05\x12\x13\n\x0bsender_name\x18\x04 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x05 \x01(\t\x12\x11\n\ttimestamp\x18\x06 \x01(\t\"A\n\x15StreamMessagesRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x05\x12\x0f\n\x07user_id\x18\x02 \x01(\x05\"U\n\x14SyncMessagesResponse\x12\x16\n\x0ereceived_count\x18\x01 \x01(\x05\x12\x14\n\x0c\x66\x61iled_count\x18\x02 \x01(\x05\x12\x0f\n\x07message\x18\x03 \x01(\t\"P\n\x11\x43hatClientMessage\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x05\x12\x11\n\tsender_id\x18\x02 \x01(\x05\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t2\xfb\x03\n\x0b\x43hatService\x12K\n\x0eGetUsersStatus\x12\x1b.chat.GetUsersStatusRequest\x1a\x1c.chat.GetUsersStatusResponse\x12\x42\n\x0bSendMessage\x12\x18.chat.SendMessageRequest\x1a\x19.chat.SendMessageResponse\x12Q\n\x10SendTypingStatus\x12\x1d.chat.SendTypingStatusRequest\x1a\x1e.chat.SendTypingStatusResponse\x12\x44\n\x0fSubscribeTyping\x12\x1c.chat.SubscribeTypingRequest\x1a\x11.chat.TypingEvent0\x01\x12\x42\n\x0eStreamMessages\x12\x1b.chat.StreamMessagesRequest\x1a\x11.chat.ChatMessage0\x01\x12\x46\n\x0cSyncMessages\x12\x18.chat.SendMessageRequest\x1a\x1a.chat.SyncMessagesResponse(\x01\x12\x36\n\x04\x43hat\x12\x17.chat.ChatClientMessage\x1a\x11.chat.ChatMessage(\x01\x30\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10proto/chat.proto\x12\x04\x63hat\"\x17\n\x15GetUsersStatusRequest\"k\n\nUserStatus\x12\x0f\n\x07user_id\x18\x01 \x01(\x03\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x03 \x01(\t\x12\x11\n\tis_online\x18\x04 \x01(\x08\x12\x11\n\tlast_seen\x18\x05 \x01(\t\"9\n\x16GetUsersStatusResponse\x12\x1f\n\x05users\x18\x01 \x03(\x0b\x32\x10.chat.UserStatus\"n\n\x12SendMessageRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x11\n\tsender_id\x18\x02 \x01(\x03\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\x12\x1b\n\x13\x63lient_timestamp_ms\x18\x04 \x01(\x03\"K\n\x13SendMessageResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x12\n\nmessage_id\x18\x03 \x01(\x03\"V\n\x17SendTypingStatusRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x0f\n\x07user_id\x18\x02 \x01(\x03\x12\x11\n\tis_typing\x18\x03 \x01(\x08\"+\n\x18SendTypingStatusResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"B\n\x16SubscribeTypingRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x0f\n\x07user_id\x18\x02 \x01(\x03\"\x85\x01\n\x0bTypingEvent\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x0f\n\x07user_id\x18\x02 \x01(\x03\x12\x10\n\x08username\x18\x03 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x04 \x01(\t\x12\x11\n\tis_typing\x18\x05 \x01(\x08\x12\x11\n\ttimestamp\x18\x06 \x01(\t\"\x86\x01\n\x0b\x43hatMessage\x12\x12\n\nmessage_id\x18\x01 \x01(\x03\x12\x17\n\x0f\x63onversation_id\x18\x02 \x01(\x03\x12\x11\n\tsender_id\x18\x03 \x01(\x03\x12\x13\n\x0bsender_name\x18\x04 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x05 \x01(\t\x12\x11\n\ttimestamp\x18\x06 \x01(\t\"A\n\x15StreamMessagesRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x0f\n\x07user_id\x18\x02 \x01(\x03\"U\n\x14SyncMessagesResponse\x12\x16\n\x0ereceived_count\x18\x01 \x01(\x05\x12\x14\n\x0c\x66\x61iled_count\x18\x02 \x01(\x05\x12\x0f\n\x07message\x18\x03 \x01(\t\"P\n\x11\x43hatClientMessage\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x11\n\tsender_id\x18\x02 \x01(\x03\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t2\xfb\x03\n\x0b\x43hatService\x12K\n\x0eGetUsersStatus\x12\x1b.chat.GetUsersStatusRequest\x1a\x1c.chat.GetUsersStatusResponse\x12\x42\n\x0bSendMessage\x12\x18.chat.SendMessageRequest\x1a\x19.chat.SendMessageResponse\x12Q\n\x10SendTypingStatus\x12\x1d.chat.SendTypingStatusRequest\x1a\x1e.chat.SendTypingStatusResponse\x12\x44\n\x0fSubscribeTyping\x12\x1c.chat.SubscribeTypingRequest\x1a\x11.chat.TypingEvent0\x01\x12\x42\n\x0eStreamMessages\x12\x1b.chat.StreamMessagesRequest\x1a\x11.chat.ChatMessage0\x01\x12\x46\n\x0cSyncMessages\x12\x18.chat.SendMessageRequest\x1a\x1a.chat.SyncMessagesResponse(\x01\x12\x36\n\x04\x43hat\x12\x17.chat.ChatClientMessage\x1a\x11.chat.ChatMessage(\x01\x30\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -38,25 +38,25 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_GETUSERSSTATUSRESPONSE']._serialized_start=160
   _globals['_GETUSERSSTATUSRESPONSE']._serialized_end=217
   _globals['_SENDMESSAGEREQUEST']._serialized_start=219
-  _globals['_SENDMESSAGEREQUEST']._serialized_end=300
-  _globals['_SENDMESSAGERESPONSE']._serialized_start=302
-  _globals['_SENDMESSAGERESPONSE']._serialized_end=377
-  _globals['_SENDTYPINGSTATUSREQUEST']._serialized_start=379
-  _globals['_SENDTYPINGSTATUSREQUEST']._serialized_end=465
-  _globals['_SENDTYPINGSTATUSRESPONSE']._serialized_start=467
-  _globals['_SENDTYPINGSTATUSRESPONSE']._serialized_end=510
-  _globals['_SUBSCRIBETYPINGREQUEST']._serialized_start=512
-  _globals['_SUBSCRIBETYPINGREQUEST']._serialized_end=578
-  _globals['_TYPINGEVENT']._serialized_start=581
-  _globals['_TYPINGEVENT']._serialized_end=714
-  _globals['_CHATMESSAGE']._serialized_start=717
-  _globals['_CHATMESSAGE']._serialized_end=851
-  _globals['_STREAMMESSAGESREQUEST']._serialized_start=853
-  _globals['_STREAMMESSAGESREQUEST']._serialized_end=918
-  _globals['_SYNCMESSAGESRESPONSE']._serialized_start=920
-  _globals['_SYNCMESSAGESRESPONSE']._serialized_end=1005
-  _globals['_CHATCLIENTMESSAGE']._serialized_start=1007
-  _globals['_CHATCLIENTMESSAGE']._serialized_end=1087
-  _globals['_CHATSERVICE']._serialized_start=1090
-  _globals['_CHATSERVICE']._serialized_end=1597
+  _globals['_SENDMESSAGEREQUEST']._serialized_end=329
+  _globals['_SENDMESSAGERESPONSE']._serialized_start=331
+  _globals['_SENDMESSAGERESPONSE']._serialized_end=406
+  _globals['_SENDTYPINGSTATUSREQUEST']._serialized_start=408
+  _globals['_SENDTYPINGSTATUSREQUEST']._serialized_end=494
+  _globals['_SENDTYPINGSTATUSRESPONSE']._serialized_start=496
+  _globals['_SENDTYPINGSTATUSRESPONSE']._serialized_end=539
+  _globals['_SUBSCRIBETYPINGREQUEST']._serialized_start=541
+  _globals['_SUBSCRIBETYPINGREQUEST']._serialized_end=607
+  _globals['_TYPINGEVENT']._serialized_start=610
+  _globals['_TYPINGEVENT']._serialized_end=743
+  _globals['_CHATMESSAGE']._serialized_start=746
+  _globals['_CHATMESSAGE']._serialized_end=880
+  _globals['_STREAMMESSAGESREQUEST']._serialized_start=882
+  _globals['_STREAMMESSAGESREQUEST']._serialized_end=947
+  _globals['_SYNCMESSAGESRESPONSE']._serialized_start=949
+  _globals['_SYNCMESSAGESRESPONSE']._serialized_end=1034
+  _globals['_CHATCLIENTMESSAGE']._serialized_start=1036
+  _globals['_CHATCLIENTMESSAGE']._serialized_end=1116
+  _globals['_CHATSERVICE']._serialized_start=1119
+  _globals['_CHATSERVICE']._serialized_end=1626
 # @@protoc_insertion_point(module_scope)

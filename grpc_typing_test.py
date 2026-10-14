@@ -6,12 +6,18 @@ import grpc
 from proto import chat_pb2, chat_pb2_grpc
 
 
+def auth_metadata(user_id):
+    # The user id returned by /api/auth/login/
+    return (("x-user-id", str(user_id)),)
+
+
 def subscribe(client, conversation_id, user_id):
     stream = client.SubscribeTyping(
         chat_pb2.SubscribeTypingRequest(
             conversation_id=conversation_id,
             user_id=user_id,
-        )
+        ),
+        metadata=auth_metadata(user_id),
     )
 
     print(f"Listening for typing in conversation {conversation_id}...")
@@ -32,6 +38,7 @@ def send(client, conversation_id, user_id):
                 user_id=user_id,
                 is_typing=is_typing,
             ),
+            metadata=auth_metadata(user_id),
             timeout=5,
         )
         print(f"Sent is_typing={is_typing}")
