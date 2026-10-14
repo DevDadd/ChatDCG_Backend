@@ -17,7 +17,7 @@ os.environ.setdefault(
 )
 django.setup()
 
-from django.db import DatabaseError, connection, transaction
+from django.db import DatabaseError, IntegrityError, connection, transaction
 from django.utils import timezone
 
 from chat.models import Conversation, Message, User
@@ -32,6 +32,7 @@ UNARY_WORKERS = int(os.getenv("GRPC_UNARY_WORKERS", "20"))
 SUBSCRIBER_QUEUE_SIZE = 1000
 MAX_SYNC_BATCH = 1000
 CONVERSATION_REFRESH_SECONDS = 10
+MAX_FIELD_LENGTH = 100
 MAX_BIGINT = 2**63 - 1
 
 
@@ -145,7 +146,7 @@ def stream_slot(context):
 def authenticate(context):
     """Return the User whose id the client sends as "x-user-id" metadata.
 
-    The client gets this id from the REST login/register response.
+    The client gets this id from the Login/Register response.
     """
     metadata = dict(context.invocation_metadata())
     raw_id = metadata.get("x-user-id", "")
@@ -216,6 +217,15 @@ def save_chat_message(caller, request):
     )
 
 
+def user_to_pb(user):
+    return chat_pb2.UserInfo(
+        id=user.id,
+        account=user.account,
+        username=user.username,
+        display_name=user.display_name,
+    )
+
+
 def message_to_pb(message, sender):
     """Serialize a persisted Message into a protobuf ChatMessage."""
     return chat_pb2.ChatMessage(
@@ -266,6 +276,77 @@ def pump(context, subscriber, skip, is_finished=lambda: False, on_tick=None):
 
 
 class ChatService(chat_pb2_grpc.ChatServiceServicer):
+    @releases_db_connection
+    def Register(self, request, context):
+        account = request.account.strip()
+        # Not stripped: spaces in a password are deliberate
+        password = request.password
+        username = request.username.strip() or account
+        display_name = request.display_name.strip() or account
+
+        if not account or not password:
+            context.abort(
+                grpc.StatusCode.INVALID_ARGUMENT,
+                "account and password are required",
+            )
+
+        if any(
+            len(value) > MAX_FIELD_LENGTH
+            for value in (account, password, username, display_name)
+        ):
+            context.abort(
+                grpc.StatusCode.INVALID_ARGUMENT,
+                f"Fields must be at most {MAX_FIELD_LENGTH} characters",
+            )
+
+        if User.objects.filter(account=account).exists():
+            context.abort(
+                grpc.StatusCode.ALREADY_EXISTS,
+                "Account already exists",
+            )
+
+        if User.objects.filter(username=username).exists():
+            context.abort(
+                grpc.StatusCode.ALREADY_EXISTS,
+                "Username already exists",
+            )
+
+        try:
+            user = User.objects.create(
+                account=account,
+                password=password,
+                username=username,
+                display_name=display_name,
+            )
+        except IntegrityError:
+            # Lost a race with a concurrent registration
+            context.abort(
+                grpc.StatusCode.ALREADY_EXISTS,
+                "Account or username already exists",
+            )
+
+        return chat_pb2.AuthResponse(user=user_to_pb(user))
+
+    @releases_db_connection
+    def Login(self, request, context):
+        account = request.account.strip()
+
+        user = (
+            User.objects.filter(
+                account=account,
+                password=request.password,
+            ).first()
+            if account and request.password
+            else None
+        )
+        if user is None:
+            context.abort(
+                grpc.StatusCode.UNAUTHENTICATED,
+                "Invalid account or password",
+            )
+
+        return chat_pb2.AuthResponse(user=user_to_pb(user))
+
     @releases_db_connection
     def GetUsersStatus(self, request, context):
         response = chat_pb2.GetUsersStatusResponse()

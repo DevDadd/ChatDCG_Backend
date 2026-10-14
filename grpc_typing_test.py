@@ -7,7 +7,7 @@ from proto import chat_pb2, chat_pb2_grpc
 
 
 def auth_metadata(user_id):
-    # The user id returned by /api/auth/login/
+    # The user id returned by the Login RPC
     return (("x-user-id", str(user_id)),)
 
 
