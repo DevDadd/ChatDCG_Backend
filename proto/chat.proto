@@ -5,6 +5,13 @@ package chat;
 
 
 service ChatService {
+  // No x-user-id needed: these return the id to send on every other call
+  rpc Register (RegisterRequest)
+      returns (AuthResponse);
+
+  rpc Login (LoginRequest)
+      returns (AuthResponse);
+
   rpc GetUsersStatus (GetUsersStatusRequest)
       returns (GetUsersStatusResponse);
 
@@ -16,14 +23,47 @@ service ChatService {
 
   rpc SubscribeTyping (SubscribeTypingRequest)
       returns (stream TypingEvent);
+
+  rpc StreamMessages (StreamMessagesRequest)
+      returns (stream ChatMessage);
+
+  rpc SyncMessages (stream SendMessageRequest)
+      returns (SyncMessagesResponse);
+
+  rpc Chat (stream ChatClientMessage)
+      returns (stream ChatMessage);
 }
 
+
+message RegisterRequest {
+  string account = 1;
+  string password = 2;
+  // Optional: default to account
+  string username = 3;
+  string display_name = 4;
+}
+
+message LoginRequest {
+  string account = 1;
+  string password = 2;
+}
+
+message UserInfo {
+  int64 id = 1;
+  string account = 2;
+  string username = 3;
+  string display_name = 4;
+}
+
+message AuthResponse {
+  UserInfo user = 1;
+}
 
 message GetUsersStatusRequest {
 }
 
 message UserStatus {
-  int32 user_id = 1;
+  int64 user_id = 1;
   string username = 2;
   string display_name = 3;
   bool is_online = 4;
@@ -35,20 +75,23 @@ message GetUsersStatusResponse {
 }
 
 message SendMessageRequest {
-  int32 conversation_id = 1;
-  int32 sender_id = 2;
+  int64 conversation_id = 1;
+  int64 sender_id = 2;
   string content = 3;
+  // Unix ms when the user wrote the message; used by SyncMessages so offline
+  // messages keep their original order. 0 = use server time.
+  int64 client_timestamp_ms = 4;
 }
 
 message SendMessageResponse {
   bool success = 1;
   string message = 2;
-  int32 message_id = 3;
+  int64 message_id = 3;
 }
 
 message SendTypingStatusRequest {
-  int32 conversation_id = 1;
-  int32 user_id = 2;
+  int64 conversation_id = 1;
+  int64 user_id = 2;
   bool is_typing = 3;
 }
 
@@ -57,15 +100,41 @@ message SendTypingStatusResponse {
 }
 
 message SubscribeTypingRequest {
-  int32 conversation_id = 1;
-  int32 user_id = 2;
+  int64 conversation_id = 1;
+  int64 user_id = 2;
 }
 
 message TypingEvent {
-  int32 conversation_id = 1;
-  int32 user_id = 2;
+  int64 conversation_id = 1;
+  int64 user_id = 2;
   string username = 3;
   string display_name = 4;
   bool is_typing = 5;
   string timestamp = 6;
+}
+
+message ChatMessage {
+  int64 message_id = 1;
+  int64 conversation_id = 2;
+  int64 sender_id = 3;
+  string sender_name = 4;
+  string content = 5;
+  string timestamp = 6;
+}
+
+message StreamMessagesRequest {
+  int64 conversation_id = 1;
+  int64 user_id = 2;
+}
+
+message SyncMessagesResponse {
+  int32 received_count = 1;
+  int32 failed_count = 2;
+  string message = 3;
+}
+
+message ChatClientMessage {
+  int64 conversation_id = 1;
+  int64 sender_id = 2;
+  string content = 3;
 }
