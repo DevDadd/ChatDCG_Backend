@@ -4,3 +4,4 @@ python-dotenv==1.2.4
 grpcio==1.84.0
 grpcio-tools==1.84.0
 protobuf>=7.35.1
+gunicorn==22.0.0
