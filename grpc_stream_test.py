@@ -68,12 +68,19 @@ def ensure_conversation(alice_id, bob_id):
     return conv.id
 
 
-def test_get_users_status(stub):
+def test_get_users_status(stub, caller_id):
     print('\n=== GetUsersStatus (unary) ===')
-    resp = stub.GetUsersStatus(chat_pb2.GetUsersStatusRequest(), timeout=TIMEOUT)
+    resp = stub.GetUsersStatus(
+        chat_pb2.GetUsersStatusRequest(),
+        metadata=meta(caller_id),
+        timeout=TIMEOUT,
+    )
+    ids = [u.user_id for u in resp.users]
     for u in resp.users:
         state = 'ONLINE' if u.is_online else 'offline'
         print(f'  {u.user_id} {u.username} ({u.display_name}) {state}')
+    assert caller_id not in ids, 'caller should be excluded from GetUsersStatus'
+    print('  PASS')
 
 
 def test_send_and_stream(stub, conv_id, alice_id, bob_id):
@@ -171,7 +178,7 @@ def main():
         conv_id = ensure_conversation(alice.id, bob.id)
         print(f'Using conversation id={conv_id}')
 
-        test_get_users_status(stub)
+        test_get_users_status(stub, alice.id)
         test_send_and_stream(stub, conv_id, alice.id, bob.id)
         test_sync_messages(stub, conv_id, alice.id)
         test_chat(stub, conv_id, alice.id, bob.id)
