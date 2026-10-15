@@ -22,6 +22,8 @@ sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 TARGET = os.getenv('GRPC_TEST_TARGET', 'localhost:50051')
 TIMEOUT = float(os.getenv('GRPC_TEST_TIMEOUT', '10'))
+SKIP_DB_SEED = os.getenv('SKIP_DB_SEED', '') == '1'
+FIXED_CONVERSATION_ID = os.getenv('CONVERSATION_ID', '')
 
 
 def meta(user_id):
@@ -50,6 +52,10 @@ def register_or_login(stub, account, password, display_name):
 
 
 def ensure_conversation(alice_id, bob_id):
+    if SKIP_DB_SEED:
+        cid = int(FIXED_CONVERSATION_ID)
+        print(f'[setup] using fixed conversation id={cid} (SKIP_DB_SEED, no local DB)')
+        return cid
     conv = (
         Conversation.objects.filter(user1_id=alice_id, user2_id=bob_id).first()
         or Conversation.objects.filter(user1_id=bob_id, user2_id=alice_id).first()
