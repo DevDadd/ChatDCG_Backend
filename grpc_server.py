@@ -623,10 +623,11 @@ def serve():
         server,
     )
 
-    port = server.add_insecure_port("[::]:50051")
+    listen_port = os.getenv("PORT", "50051")
+    port = server.add_insecure_port(f"[::]:{listen_port}")
 
     if port == 0:
-        raise RuntimeError("Cannot bind to port 50051")
+        raise RuntimeError(f"Cannot bind to port {listen_port}")
 
     server.start()
     print(f"gRPC server running on port {port}")
