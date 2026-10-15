@@ -35,6 +35,13 @@ CONVERSATION_REFRESH_SECONDS = 10
 MAX_FIELD_LENGTH = 100
 MAX_BIGINT = 2**63 - 1
 
+# Login marks the user online right away; they stay online past this only if
+# the app opens a stream (Presence, Chat, ...) in the meantime.
+LOGIN_GRACE_SECONDS = int(os.getenv("GRPC_LOGIN_GRACE_SECONDS", "60"))
+PRESENCE_SWEEP_SECONDS = 5
+# Every presence event goes out on this one broker key
+PRESENCE_TOPIC = 0
+
 
 class Subscriber:
     """A bounded inbox; flagged as overflowed when the consumer falls behind."""
@@ -84,6 +91,7 @@ class PubSubBroker:
 
 typing_broker = PubSubBroker()
 message_broker = PubSubBroker()
+presence_broker = PubSubBroker()
 
 _stream_slots = threading.BoundedSemaphore(MAX_STREAMS)
 
@@ -141,6 +149,112 @@ def stream_slot(context):
         yield
     finally:
         _stream_slots.release()
+
+
+def save_presence(user_id, is_online, now):
+    fields = {"is_online": is_online}
+    if not is_online:
+        fields["last_seen"] = now
+    User.objects.filter(id=user_id).update(**fields)
+
+
+class PresenceTracker:
+    """Who is online: users with an open stream, or a login still in its
+    grace period. Writes User.is_online and publishes a PresenceEvent only
+    when that changes.
+    """
+
+    def __init__(self):
+        # Held across the DB write so writes land in the order states changed
+        self._lock = threading.Lock()
+        # user_id -> contexts of that user's open streams
+        self._connections = defaultdict(set)
+        self._grace_until = {}
+        self._online = set()
+
+    def logged_in(self, user_id):
+        with self._lock:
+            self._grace_until[user_id] = (
+                time.monotonic() + LOGIN_GRACE_SECONDS
+            )
+            self._sync(user_id)
+
+    def logged_out(self, user_id):
+        # Ends every open stream of the user, on all their devices
+        with self._lock:
+            self._grace_until.pop(user_id, None)
+            contexts = self._connections.pop(user_id, set())
+            self._sync(user_id)
+        for context in contexts:
+            context.cancel()
+
+    @contextmanager
+    def connection(self, user_id, context):
+        with self._lock:
+            self._connections[user_id].add(context)
+            self._sync(user_id)
+        try:
+            yield
+        finally:
+            with self._lock:
+                # Already gone if the user logged out meanwhile
+                contexts = self._connections.get(user_id)
+                if contexts is not None:
+                    contexts.discard(context)
+                    if not contexts:
+                        del self._connections[user_id]
+                self._sync(user_id)
+
+    def expire_logins(self):
+        now = time.monotonic()
+        with self._lock:
+            expired = [
+                user_id
+                for user_id, until in self._grace_until.items()
+                if until <= now
+            ]
+            for user_id in expired:
+                del self._grace_until[user_id]
+                self._sync(user_id)
+
+    def _sync(self, user_id):
+        is_online = (
+            user_id in self._connections
+            or self._grace_until.get(user_id, 0) > time.monotonic()
+        )
+        if is_online == (user_id in self._online):
+            return
+
+        now = timezone.now()
+        try:
+            run_chat_db(save_presence, user_id, is_online, now)
+        except DatabaseError as exc:
+            # Left unchanged so the next change for this user retries
+            print(f"Failed to save presence of user {user_id}: {exc}")
+            return
+
+        if is_online:
+            self._online.add(user_id)
+        else:
+            self._online.discard(user_id)
+
+        presence_broker.publish(
+            PRESENCE_TOPIC,
+            chat_pb2.PresenceEvent(
+                user_id=user_id,
+                is_online=is_online,
+                last_seen="" if is_online else now.isoformat(),
+            ),
+        )
+
+
+presence = PresenceTracker()
+
+
+def sweep_expired_logins():
+    while True:
+        time.sleep(PRESENCE_SWEEP_SECONDS)
+        presence.expire_logins()
 
 
 def authenticate(context):
@@ -325,6 +439,7 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
                 "Account or username already exists",
             )
 
+        presence.logged_in(user.id)
         return chat_pb2.AuthResponse(user=user_to_pb(user))
 
     @releases_db_connection
@@ -345,7 +460,14 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
                 "Invalid account or password",
             )
 
+        presence.logged_in(user.id)
         return chat_pb2.AuthResponse(user=user_to_pb(user))
+
+    @releases_db_connection
+    def Logout(self, request, context):
+        caller = authenticate(context)
+        presence.logged_out(caller.id)
+        return chat_pb2.LogoutResponse(success=True)
 
     @releases_db_connection
     def GetUsersStatus(self, request, context):
@@ -407,12 +529,13 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
             typing_broker.subscribe(request.conversation_id, subscriber)
 
             try:
-                # Don't echo the subscriber's own typing back to them
-                yield from pump(
-                    context,
-                    subscriber,
-                    skip=lambda event: event.user_id == caller.id,
-                )
+                with presence.connection(caller.id, context):
+                    # Don't echo the subscriber's own typing back to them
+                    yield from pump(
+                        context,
+                        subscriber,
+                        skip=lambda event: event.user_id == caller.id,
+                    )
             finally:
                 typing_broker.unsubscribe(request.conversation_id, subscriber)
 
@@ -456,12 +579,13 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
             message_broker.subscribe(request.conversation_id, subscriber)
 
             try:
-                # Don't echo the subscriber's own messages back to them
-                yield from pump(
-                    context,
-                    subscriber,
-                    skip=lambda event: event.sender_id == caller.id,
-                )
+                with presence.connection(caller.id, context):
+                    # Don't echo the subscriber's own messages back to them
+                    yield from pump(
+                        context,
+                        subscriber,
+                        skip=lambda event: event.sender_id == caller.id,
+                    )
             finally:
                 message_broker.unsubscribe(
                     request.conversation_id, subscriber
@@ -588,35 +712,72 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
             threading.Thread(target=reader, daemon=True).start()
 
             try:
-                # The client closing its send side doesn't end the stream:
-                # it may still be listening.
-                yield from pump(
-                    context,
-                    subscriber,
-                    skip=lambda event: event.sender_id == caller.id,
-                    is_finished=lambda: reader_state["error"] is not None,
-                    on_tick=refresh_conversations,
-                )
-
-                error = reader_state["error"]
-                if isinstance(error, AbortError):
-                    context.abort(error.code, error.details)
-                elif error is not None and context.is_active():
-                    context.abort(
-                        grpc.StatusCode.INTERNAL,
-                        "Failed to process message",
+                with presence.connection(caller.id, context):
+                    # The client closing its send side doesn't end the stream:
+                    # it may still be listening.
+                    yield from pump(
+                        context,
+                        subscriber,
+                        skip=lambda event: event.sender_id == caller.id,
+                        is_finished=lambda: reader_state["error"] is not None,
+                        on_tick=refresh_conversations,
                     )
+
+                    error = reader_state["error"]
+                    if isinstance(error, AbortError):
+                        context.abort(error.code, error.details)
+                    elif error is not None and context.is_active():
+                        context.abort(
+                            grpc.StatusCode.INTERNAL,
+                            "Failed to process message",
+                        )
             finally:
                 with subscriptions_lock:
                     closed = True
                     for conversation_id in subscribed:
                         message_broker.unsubscribe(conversation_id, subscriber)
 
+    def Presence(self, request, context):
+        with stream_slot(context):
+            try:
+                caller = authenticate(context)
+            finally:
+                connection.close()
+
+            subscriber = Subscriber()
+            presence_broker.subscribe(PRESENCE_TOPIC, subscriber)
+
+            try:
+                with presence.connection(caller.id, context):
+                    yield from pump(
+                        context,
+                        subscriber,
+                        skip=lambda event: event.user_id == caller.id,
+                    )
+            finally:
+                presence_broker.unsubscribe(PRESENCE_TOPIC, subscriber)
+
 
 def serve():
+    # Presence is only as fresh as the server's view of the connection:
+    # these pings drop a client whose network vanished without closing it.
     server = grpc.server(
-        futures.ThreadPoolExecutor(max_workers=MAX_STREAMS + UNARY_WORKERS)
+        futures.ThreadPoolExecutor(max_workers=MAX_STREAMS + UNARY_WORKERS),
+        options=[
+            ("grpc.keepalive_time_ms", 30_000),
+            ("grpc.keepalive_timeout_ms", 10_000),
+            ("grpc.keepalive_permit_without_calls", 1),
+            ("grpc.http2.min_ping_interval_without_data_ms", 10_000),
+            ("grpc.http2.max_pings_without_data", 0),
+        ],
     )
+
+    # Nobody is connected yet: clear whoever was online when we last stopped
+    User.objects.filter(is_online=True).update(
+        is_online=False, last_seen=timezone.now()
+    )
+    connection.close()
+    threading.Thread(target=sweep_expired_logins, daemon=True).start()
 
     chat_pb2_grpc.add_ChatServiceServicer_to_server(
         ChatService(),

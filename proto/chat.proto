@@ -12,6 +12,10 @@ service ChatService {
   rpc Login (LoginRequest)
       returns (AuthResponse);
 
+  // Marks the caller offline and ends their open streams on every device
+  rpc Logout (LogoutRequest)
+      returns (LogoutResponse);
+
   rpc GetUsersStatus (GetUsersStatusRequest)
       returns (GetUsersStatusResponse);
 
@@ -32,6 +36,12 @@ service ChatService {
 
   rpc Chat (stream ChatClientMessage)
       returns (stream ChatMessage);
+
+  // Open right after Login/Register and keep open while the app runs: the
+  // caller stays online while it is open, and receives other users'
+  // online/offline changes.
+  rpc Presence (PresenceRequest)
+      returns (stream PresenceEvent);
 }
 
 
@@ -46,6 +56,13 @@ message RegisterRequest {
 message LoginRequest {
   string account = 1;
   string password = 2;
+}
+
+message LogoutRequest {
+}
+
+message LogoutResponse {
+  bool success = 1;
 }
 
 message UserInfo {
@@ -137,4 +154,13 @@ message ChatClientMessage {
   int64 conversation_id = 1;
   int64 sender_id = 2;
   string content = 3;
+}
+
+message PresenceRequest {
+}
+
+message PresenceEvent {
+  int64 user_id = 1;
+  bool is_online = 2;
+  string last_seen = 3;
 }

@@ -44,6 +44,11 @@ class ChatServiceStub:
                 request_serializer=proto_dot_chat__pb2.LoginRequest.SerializeToString,
                 response_deserializer=proto_dot_chat__pb2.AuthResponse.FromString,
                 _registered_method=True)
+        self.Logout = channel.unary_unary(
+                '/chat.ChatService/Logout',
+                request_serializer=proto_dot_chat__pb2.LogoutRequest.SerializeToString,
+                response_deserializer=proto_dot_chat__pb2.LogoutResponse.FromString,
+                _registered_method=True)
         self.GetUsersStatus = channel.unary_unary(
                 '/chat.ChatService/GetUsersStatus',
                 request_serializer=proto_dot_chat__pb2.GetUsersStatusRequest.SerializeToString,
@@ -79,6 +84,11 @@ class ChatServiceStub:
                 request_serializer=proto_dot_chat__pb2.ChatClientMessage.SerializeToString,
                 response_deserializer=proto_dot_chat__pb2.ChatMessage.FromString,
                 _registered_method=True)
+        self.Presence = channel.unary_stream(
+                '/chat.ChatService/Presence',
+                request_serializer=proto_dot_chat__pb2.PresenceRequest.SerializeToString,
+                response_deserializer=proto_dot_chat__pb2.PresenceEvent.FromString,
+                _registered_method=True)
 
 
 class ChatServiceServicer:
@@ -93,6 +103,13 @@ class ChatServiceServicer:
 
     def Login(self, request, context):
         """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def Logout(self, request, context):
+        """Marks the caller offline and ends their open streams on every device
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -139,6 +156,15 @@ class ChatServiceServicer:
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def Presence(self, request, context):
+        """Open right after Login/Register and keep open while the app runs: the
+        caller stays online while it is open, and receives other users'
+        online/offline changes.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ChatServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -151,6 +177,11 @@ def add_ChatServiceServicer_to_server(servicer, server):
                     servicer.Login,
                     request_deserializer=proto_dot_chat__pb2.LoginRequest.FromString,
                     response_serializer=proto_dot_chat__pb2.AuthResponse.SerializeToString,
+            ),
+            'Logout': grpc.unary_unary_rpc_method_handler(
+                    servicer.Logout,
+                    request_deserializer=proto_dot_chat__pb2.LogoutRequest.FromString,
+                    response_serializer=proto_dot_chat__pb2.LogoutResponse.SerializeToString,
             ),
             'GetUsersStatus': grpc.unary_unary_rpc_method_handler(
                     servicer.GetUsersStatus,
@@ -186,6 +217,11 @@ def add_ChatServiceServicer_to_server(servicer, server):
                     servicer.Chat,
                     request_deserializer=proto_dot_chat__pb2.ChatClientMessage.FromString,
                     response_serializer=proto_dot_chat__pb2.ChatMessage.SerializeToString,
+            ),
+            'Presence': grpc.unary_stream_rpc_method_handler(
+                    servicer.Presence,
+                    request_deserializer=proto_dot_chat__pb2.PresenceRequest.FromString,
+                    response_serializer=proto_dot_chat__pb2.PresenceEvent.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -242,6 +278,33 @@ class ChatService:
             '/chat.ChatService/Login',
             proto_dot_chat__pb2.LoginRequest.SerializeToString,
             proto_dot_chat__pb2.AuthResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def Logout(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/chat.ChatService/Logout',
+            proto_dot_chat__pb2.LogoutRequest.SerializeToString,
+            proto_dot_chat__pb2.LogoutResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -431,6 +494,33 @@ class ChatService:
             '/chat.ChatService/Chat',
             proto_dot_chat__pb2.ChatClientMessage.SerializeToString,
             proto_dot_chat__pb2.ChatMessage.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def Presence(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(
+            request,
+            target,
+            '/chat.ChatService/Presence',
+            proto_dot_chat__pb2.PresenceRequest.SerializeToString,
+            proto_dot_chat__pb2.PresenceEvent.FromString,
             options,
             channel_credentials,
             insecure,
