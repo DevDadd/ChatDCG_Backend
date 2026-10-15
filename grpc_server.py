@@ -624,7 +624,7 @@ def serve():
     )
 
     listen_port = os.getenv("PORT", "50051")
-    port = server.add_insecure_port(f"[::]:{listen_port}")
+    port = server.add_insecure_port(f"0.0.0.0:{listen_port}")
 
     if port == 0:
         raise RuntimeError(f"Cannot bind to port {listen_port}")
