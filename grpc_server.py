@@ -471,9 +471,11 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
 
     @releases_db_connection
     def GetUsersStatus(self, request, context):
+        caller = authenticate(context)
+        
         response = chat_pb2.GetUsersStatusResponse()
 
-        users = User.objects.all().order_by("id")
+        users = User.objects.exclude(id=caller.id).order_by("id")
 
         for user in users:
             response.users.add(
