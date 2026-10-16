@@ -18,6 +18,7 @@ os.environ.setdefault(
 django.setup()
 
 from django.db import DatabaseError, IntegrityError, connection, transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from chat.models import Conversation, Message, User
@@ -487,6 +488,50 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
                     if user.last_seen
                     else ""
                 ),
+            )
+
+        return response
+
+    @releases_db_connection
+    def GetConversationHistory(self, request, context):
+        caller = authenticate(context)
+
+        other_user_id = request.other_user_id
+
+        # Tìm conversation 1-1 giữa caller và other_user_id
+        conversation = (
+            Conversation.objects.filter(
+                Q(user1_id=caller.id, user2_id=other_user_id)
+                | Q(user1_id=other_user_id, user2_id=caller.id)
+            )
+            .first()
+        )
+
+        response = chat_pb2.GetConversationHistoryResponse()
+
+        if conversation is None:
+            # Chưa bao giờ có cuộc trò chuyện giữa 2 người -> trả về rỗng
+            response.total_count = 0
+            return response
+
+        # Lấy TOÀN BỘ tin nhắn, cũ -> mới, kèm sender để tránh N+1
+        messages = (
+            Message.objects
+            .filter(conversation_id=conversation.id)
+            .select_related('sender')
+            .order_by("created_at")
+        )
+
+        response.total_count = messages.count()
+
+        for m in messages:
+            response.messages.add(
+                message_id=m.id,
+                conversation_id=m.conversation_id,
+                sender_id=m.sender_id,
+                sender_name=m.sender.display_name,
+                content=m.content,
+                timestamp=m.created_at.isoformat(),
             )
 
         return response

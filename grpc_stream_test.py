@@ -83,6 +83,22 @@ def test_get_users_status(stub, caller_id):
     print('  PASS')
 
 
+def test_get_conversation_history(stub, caller_id, other_user_id):
+    print('\n=== GetConversationHistory (unary) ===')
+    resp = stub.GetConversationHistory(
+        chat_pb2.GetConversationHistoryRequest(
+            other_user_id=other_user_id,
+        ),
+        metadata=meta(caller_id),
+        timeout=TIMEOUT,
+    )
+    print(f'  total_count={resp.total_count} returned={len(resp.messages)}')
+    for m in resp.messages:
+        print(f'  [{m.message_id}] {m.sender_name}: {m.content} ({m.timestamp})')
+    assert resp.total_count == len(resp.messages), 'total_count phải bằng số messages trả về'
+    print('  PASS')
+
+
 def test_send_and_stream(stub, conv_id, alice_id, bob_id):
     print('\n=== SendMessage + StreamMessages (server streaming) ===')
     received = []
@@ -179,6 +195,7 @@ def main():
         print(f'Using conversation id={conv_id}')
 
         test_get_users_status(stub, alice.id)
+        test_get_conversation_history(stub, alice.id, bob.id)
         test_send_and_stream(stub, conv_id, alice.id, bob.id)
         test_sync_messages(stub, conv_id, alice.id)
         test_chat(stub, conv_id, alice.id, bob.id)

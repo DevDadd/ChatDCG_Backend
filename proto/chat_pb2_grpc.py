@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from proto import chat_pb2 as proto_dot_chat__pb2
+from proto import chat_pb2 as chat__pb2
 
 GRPC_GENERATED_VERSION = '1.84.0'
 GRPC_VERSION = grpc.__version__
@@ -18,7 +18,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + ' but the generated code in proto/chat_pb2_grpc.py depends on'
+        + ' but the generated code in chat_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -36,58 +36,63 @@ class ChatServiceStub:
         """
         self.Register = channel.unary_unary(
                 '/chat.ChatService/Register',
-                request_serializer=proto_dot_chat__pb2.RegisterRequest.SerializeToString,
-                response_deserializer=proto_dot_chat__pb2.AuthResponse.FromString,
+                request_serializer=chat__pb2.RegisterRequest.SerializeToString,
+                response_deserializer=chat__pb2.AuthResponse.FromString,
                 _registered_method=True)
         self.Login = channel.unary_unary(
                 '/chat.ChatService/Login',
-                request_serializer=proto_dot_chat__pb2.LoginRequest.SerializeToString,
-                response_deserializer=proto_dot_chat__pb2.AuthResponse.FromString,
+                request_serializer=chat__pb2.LoginRequest.SerializeToString,
+                response_deserializer=chat__pb2.AuthResponse.FromString,
                 _registered_method=True)
         self.Logout = channel.unary_unary(
                 '/chat.ChatService/Logout',
-                request_serializer=proto_dot_chat__pb2.LogoutRequest.SerializeToString,
-                response_deserializer=proto_dot_chat__pb2.LogoutResponse.FromString,
+                request_serializer=chat__pb2.LogoutRequest.SerializeToString,
+                response_deserializer=chat__pb2.LogoutResponse.FromString,
                 _registered_method=True)
         self.GetUsersStatus = channel.unary_unary(
                 '/chat.ChatService/GetUsersStatus',
-                request_serializer=proto_dot_chat__pb2.GetUsersStatusRequest.SerializeToString,
-                response_deserializer=proto_dot_chat__pb2.GetUsersStatusResponse.FromString,
+                request_serializer=chat__pb2.GetUsersStatusRequest.SerializeToString,
+                response_deserializer=chat__pb2.GetUsersStatusResponse.FromString,
+                _registered_method=True)
+        self.GetConversationHistory = channel.unary_unary(
+                '/chat.ChatService/GetConversationHistory',
+                request_serializer=chat__pb2.GetConversationHistoryRequest.SerializeToString,
+                response_deserializer=chat__pb2.GetConversationHistoryResponse.FromString,
                 _registered_method=True)
         self.SendMessage = channel.unary_unary(
                 '/chat.ChatService/SendMessage',
-                request_serializer=proto_dot_chat__pb2.SendMessageRequest.SerializeToString,
-                response_deserializer=proto_dot_chat__pb2.SendMessageResponse.FromString,
+                request_serializer=chat__pb2.SendMessageRequest.SerializeToString,
+                response_deserializer=chat__pb2.SendMessageResponse.FromString,
                 _registered_method=True)
         self.SendTypingStatus = channel.unary_unary(
                 '/chat.ChatService/SendTypingStatus',
-                request_serializer=proto_dot_chat__pb2.SendTypingStatusRequest.SerializeToString,
-                response_deserializer=proto_dot_chat__pb2.SendTypingStatusResponse.FromString,
+                request_serializer=chat__pb2.SendTypingStatusRequest.SerializeToString,
+                response_deserializer=chat__pb2.SendTypingStatusResponse.FromString,
                 _registered_method=True)
         self.SubscribeTyping = channel.unary_stream(
                 '/chat.ChatService/SubscribeTyping',
-                request_serializer=proto_dot_chat__pb2.SubscribeTypingRequest.SerializeToString,
-                response_deserializer=proto_dot_chat__pb2.TypingEvent.FromString,
+                request_serializer=chat__pb2.SubscribeTypingRequest.SerializeToString,
+                response_deserializer=chat__pb2.TypingEvent.FromString,
                 _registered_method=True)
         self.StreamMessages = channel.unary_stream(
                 '/chat.ChatService/StreamMessages',
-                request_serializer=proto_dot_chat__pb2.StreamMessagesRequest.SerializeToString,
-                response_deserializer=proto_dot_chat__pb2.ChatMessage.FromString,
+                request_serializer=chat__pb2.StreamMessagesRequest.SerializeToString,
+                response_deserializer=chat__pb2.ChatMessage.FromString,
                 _registered_method=True)
         self.SyncMessages = channel.stream_unary(
                 '/chat.ChatService/SyncMessages',
-                request_serializer=proto_dot_chat__pb2.SendMessageRequest.SerializeToString,
-                response_deserializer=proto_dot_chat__pb2.SyncMessagesResponse.FromString,
+                request_serializer=chat__pb2.SendMessageRequest.SerializeToString,
+                response_deserializer=chat__pb2.SyncMessagesResponse.FromString,
                 _registered_method=True)
         self.Chat = channel.stream_stream(
                 '/chat.ChatService/Chat',
-                request_serializer=proto_dot_chat__pb2.ChatClientMessage.SerializeToString,
-                response_deserializer=proto_dot_chat__pb2.ChatMessage.FromString,
+                request_serializer=chat__pb2.ChatClientMessage.SerializeToString,
+                response_deserializer=chat__pb2.ChatMessage.FromString,
                 _registered_method=True)
         self.Presence = channel.unary_stream(
                 '/chat.ChatService/Presence',
-                request_serializer=proto_dot_chat__pb2.PresenceRequest.SerializeToString,
-                response_deserializer=proto_dot_chat__pb2.PresenceEvent.FromString,
+                request_serializer=chat__pb2.PresenceRequest.SerializeToString,
+                response_deserializer=chat__pb2.PresenceEvent.FromString,
                 _registered_method=True)
 
 
@@ -115,6 +120,12 @@ class ChatServiceServicer:
         raise NotImplementedError('Method not implemented!')
 
     def GetUsersStatus(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetConversationHistory(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -170,58 +181,63 @@ def add_ChatServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Register': grpc.unary_unary_rpc_method_handler(
                     servicer.Register,
-                    request_deserializer=proto_dot_chat__pb2.RegisterRequest.FromString,
-                    response_serializer=proto_dot_chat__pb2.AuthResponse.SerializeToString,
+                    request_deserializer=chat__pb2.RegisterRequest.FromString,
+                    response_serializer=chat__pb2.AuthResponse.SerializeToString,
             ),
             'Login': grpc.unary_unary_rpc_method_handler(
                     servicer.Login,
-                    request_deserializer=proto_dot_chat__pb2.LoginRequest.FromString,
-                    response_serializer=proto_dot_chat__pb2.AuthResponse.SerializeToString,
+                    request_deserializer=chat__pb2.LoginRequest.FromString,
+                    response_serializer=chat__pb2.AuthResponse.SerializeToString,
             ),
             'Logout': grpc.unary_unary_rpc_method_handler(
                     servicer.Logout,
-                    request_deserializer=proto_dot_chat__pb2.LogoutRequest.FromString,
-                    response_serializer=proto_dot_chat__pb2.LogoutResponse.SerializeToString,
+                    request_deserializer=chat__pb2.LogoutRequest.FromString,
+                    response_serializer=chat__pb2.LogoutResponse.SerializeToString,
             ),
             'GetUsersStatus': grpc.unary_unary_rpc_method_handler(
                     servicer.GetUsersStatus,
-                    request_deserializer=proto_dot_chat__pb2.GetUsersStatusRequest.FromString,
-                    response_serializer=proto_dot_chat__pb2.GetUsersStatusResponse.SerializeToString,
+                    request_deserializer=chat__pb2.GetUsersStatusRequest.FromString,
+                    response_serializer=chat__pb2.GetUsersStatusResponse.SerializeToString,
+            ),
+            'GetConversationHistory': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetConversationHistory,
+                    request_deserializer=chat__pb2.GetConversationHistoryRequest.FromString,
+                    response_serializer=chat__pb2.GetConversationHistoryResponse.SerializeToString,
             ),
             'SendMessage': grpc.unary_unary_rpc_method_handler(
                     servicer.SendMessage,
-                    request_deserializer=proto_dot_chat__pb2.SendMessageRequest.FromString,
-                    response_serializer=proto_dot_chat__pb2.SendMessageResponse.SerializeToString,
+                    request_deserializer=chat__pb2.SendMessageRequest.FromString,
+                    response_serializer=chat__pb2.SendMessageResponse.SerializeToString,
             ),
             'SendTypingStatus': grpc.unary_unary_rpc_method_handler(
                     servicer.SendTypingStatus,
-                    request_deserializer=proto_dot_chat__pb2.SendTypingStatusRequest.FromString,
-                    response_serializer=proto_dot_chat__pb2.SendTypingStatusResponse.SerializeToString,
+                    request_deserializer=chat__pb2.SendTypingStatusRequest.FromString,
+                    response_serializer=chat__pb2.SendTypingStatusResponse.SerializeToString,
             ),
             'SubscribeTyping': grpc.unary_stream_rpc_method_handler(
                     servicer.SubscribeTyping,
-                    request_deserializer=proto_dot_chat__pb2.SubscribeTypingRequest.FromString,
-                    response_serializer=proto_dot_chat__pb2.TypingEvent.SerializeToString,
+                    request_deserializer=chat__pb2.SubscribeTypingRequest.FromString,
+                    response_serializer=chat__pb2.TypingEvent.SerializeToString,
             ),
             'StreamMessages': grpc.unary_stream_rpc_method_handler(
                     servicer.StreamMessages,
-                    request_deserializer=proto_dot_chat__pb2.StreamMessagesRequest.FromString,
-                    response_serializer=proto_dot_chat__pb2.ChatMessage.SerializeToString,
+                    request_deserializer=chat__pb2.StreamMessagesRequest.FromString,
+                    response_serializer=chat__pb2.ChatMessage.SerializeToString,
             ),
             'SyncMessages': grpc.stream_unary_rpc_method_handler(
                     servicer.SyncMessages,
-                    request_deserializer=proto_dot_chat__pb2.SendMessageRequest.FromString,
-                    response_serializer=proto_dot_chat__pb2.SyncMessagesResponse.SerializeToString,
+                    request_deserializer=chat__pb2.SendMessageRequest.FromString,
+                    response_serializer=chat__pb2.SyncMessagesResponse.SerializeToString,
             ),
             'Chat': grpc.stream_stream_rpc_method_handler(
                     servicer.Chat,
-                    request_deserializer=proto_dot_chat__pb2.ChatClientMessage.FromString,
-                    response_serializer=proto_dot_chat__pb2.ChatMessage.SerializeToString,
+                    request_deserializer=chat__pb2.ChatClientMessage.FromString,
+                    response_serializer=chat__pb2.ChatMessage.SerializeToString,
             ),
             'Presence': grpc.unary_stream_rpc_method_handler(
                     servicer.Presence,
-                    request_deserializer=proto_dot_chat__pb2.PresenceRequest.FromString,
-                    response_serializer=proto_dot_chat__pb2.PresenceEvent.SerializeToString,
+                    request_deserializer=chat__pb2.PresenceRequest.FromString,
+                    response_serializer=chat__pb2.PresenceEvent.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -249,8 +265,8 @@ class ChatService:
             request,
             target,
             '/chat.ChatService/Register',
-            proto_dot_chat__pb2.RegisterRequest.SerializeToString,
-            proto_dot_chat__pb2.AuthResponse.FromString,
+            chat__pb2.RegisterRequest.SerializeToString,
+            chat__pb2.AuthResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -276,8 +292,8 @@ class ChatService:
             request,
             target,
             '/chat.ChatService/Login',
-            proto_dot_chat__pb2.LoginRequest.SerializeToString,
-            proto_dot_chat__pb2.AuthResponse.FromString,
+            chat__pb2.LoginRequest.SerializeToString,
+            chat__pb2.AuthResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -303,8 +319,8 @@ class ChatService:
             request,
             target,
             '/chat.ChatService/Logout',
-            proto_dot_chat__pb2.LogoutRequest.SerializeToString,
-            proto_dot_chat__pb2.LogoutResponse.FromString,
+            chat__pb2.LogoutRequest.SerializeToString,
+            chat__pb2.LogoutResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -330,8 +346,35 @@ class ChatService:
             request,
             target,
             '/chat.ChatService/GetUsersStatus',
-            proto_dot_chat__pb2.GetUsersStatusRequest.SerializeToString,
-            proto_dot_chat__pb2.GetUsersStatusResponse.FromString,
+            chat__pb2.GetUsersStatusRequest.SerializeToString,
+            chat__pb2.GetUsersStatusResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetConversationHistory(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/chat.ChatService/GetConversationHistory',
+            chat__pb2.GetConversationHistoryRequest.SerializeToString,
+            chat__pb2.GetConversationHistoryResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -357,8 +400,8 @@ class ChatService:
             request,
             target,
             '/chat.ChatService/SendMessage',
-            proto_dot_chat__pb2.SendMessageRequest.SerializeToString,
-            proto_dot_chat__pb2.SendMessageResponse.FromString,
+            chat__pb2.SendMessageRequest.SerializeToString,
+            chat__pb2.SendMessageResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -384,8 +427,8 @@ class ChatService:
             request,
             target,
             '/chat.ChatService/SendTypingStatus',
-            proto_dot_chat__pb2.SendTypingStatusRequest.SerializeToString,
-            proto_dot_chat__pb2.SendTypingStatusResponse.FromString,
+            chat__pb2.SendTypingStatusRequest.SerializeToString,
+            chat__pb2.SendTypingStatusResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -411,8 +454,8 @@ class ChatService:
             request,
             target,
             '/chat.ChatService/SubscribeTyping',
-            proto_dot_chat__pb2.SubscribeTypingRequest.SerializeToString,
-            proto_dot_chat__pb2.TypingEvent.FromString,
+            chat__pb2.SubscribeTypingRequest.SerializeToString,
+            chat__pb2.TypingEvent.FromString,
             options,
             channel_credentials,
             insecure,
@@ -438,8 +481,8 @@ class ChatService:
             request,
             target,
             '/chat.ChatService/StreamMessages',
-            proto_dot_chat__pb2.StreamMessagesRequest.SerializeToString,
-            proto_dot_chat__pb2.ChatMessage.FromString,
+            chat__pb2.StreamMessagesRequest.SerializeToString,
+            chat__pb2.ChatMessage.FromString,
             options,
             channel_credentials,
             insecure,
@@ -465,8 +508,8 @@ class ChatService:
             request_iterator,
             target,
             '/chat.ChatService/SyncMessages',
-            proto_dot_chat__pb2.SendMessageRequest.SerializeToString,
-            proto_dot_chat__pb2.SyncMessagesResponse.FromString,
+            chat__pb2.SendMessageRequest.SerializeToString,
+            chat__pb2.SyncMessagesResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -492,8 +535,8 @@ class ChatService:
             request_iterator,
             target,
             '/chat.ChatService/Chat',
-            proto_dot_chat__pb2.ChatClientMessage.SerializeToString,
-            proto_dot_chat__pb2.ChatMessage.FromString,
+            chat__pb2.ChatClientMessage.SerializeToString,
+            chat__pb2.ChatMessage.FromString,
             options,
             channel_credentials,
             insecure,
@@ -519,8 +562,8 @@ class ChatService:
             request,
             target,
             '/chat.ChatService/Presence',
-            proto_dot_chat__pb2.PresenceRequest.SerializeToString,
-            proto_dot_chat__pb2.PresenceEvent.FromString,
+            chat__pb2.PresenceRequest.SerializeToString,
+            chat__pb2.PresenceEvent.FromString,
             options,
             channel_credentials,
             insecure,
