@@ -439,7 +439,6 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
                 "Account or username already exists",
             )
 
-        presence.logged_in(user.id)
         return chat_pb2.AuthResponse(user=user_to_pb(user))
 
     @releases_db_connection
