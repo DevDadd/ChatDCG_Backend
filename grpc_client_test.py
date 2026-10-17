@@ -15,7 +15,7 @@ def main():
                     password="alice-pass",
                     display_name="Alice",
                 ),
-                timeout=5,
+                timeout=10,
             ).user
         except grpc.RpcError as e:
             if e.code() == grpc.StatusCode.ALREADY_EXISTS:
@@ -23,7 +23,7 @@ def main():
                     chat_pb2.LoginRequest(
                         account="alice_test", password="alice-pass"
                     ),
-                    timeout=5,
+                    timeout=10,
                 ).user
             else:
                 raise
@@ -31,7 +31,7 @@ def main():
         response = client.GetUsersStatus(
             chat_pb2.GetUsersStatusRequest(),
             metadata=(("x-user-id", str(me.id)),),
-            timeout=5,
+            timeout=10,
         )
 
         for user in response.users:
@@ -43,6 +43,22 @@ def main():
                 f"{user.display_name} | "
                 f"{status} | "
                 f"{user.last_seen or 'Never'}"
+            )
+
+        conversations = client.GetConversations(
+            chat_pb2.GetConversationsRequest(),
+            metadata=(("x-user-id", str(me.id)),),
+            timeout=10,
+        )
+
+        print("\nConversations:")
+        for conversation in conversations.conversations:
+            other_user = conversation.other_user
+            print(
+                f"{conversation.conversation_id} | "
+                f"{other_user.username} | "
+                f"{other_user.display_name} | "
+                f"{conversation.created_at}"
             )
 
 

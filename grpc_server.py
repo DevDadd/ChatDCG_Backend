@@ -341,6 +341,14 @@ def user_to_pb(user):
     )
 
 
+def conversation_to_pb(conversation, other_user):
+    return chat_pb2.ConversationInfo(
+        conversation_id=conversation.id,
+        other_user=user_to_pb(other_user),
+        created_at=conversation.created_at.isoformat(),
+    )
+
+
 def message_to_pb(message, sender):
     """Serialize a persisted Message into a protobuf ChatMessage."""
     return chat_pb2.ChatMessage(
@@ -534,6 +542,79 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
                 timestamp=m.created_at.isoformat(),
             )
 
+        return response
+
+    @releases_db_connection
+    def CreateConversation(self, request, context):
+        caller = authenticate(context)
+        other_user_id = request.other_user_id
+
+        if other_user_id == caller.id:
+            context.abort(
+                grpc.StatusCode.INVALID_ARGUMENT,
+                "Cannot create a conversation with yourself",
+            )
+
+        with transaction.atomic():
+            # Lock both users in a stable order so concurrent opens cannot
+            # create duplicate conversations for the same pair.
+            users = list(
+                User.objects.select_for_update()
+                .filter(id__in=(caller.id, other_user_id))
+                .order_by("id")
+            )
+            other_user = next(
+                (user for user in users if user.id == other_user_id),
+                None,
+            )
+            if other_user is None:
+                context.abort(
+                    grpc.StatusCode.NOT_FOUND,
+                    f"User {other_user_id} not found",
+                )
+
+            conversation = (
+                Conversation.objects.filter(
+                    Q(user1_id=caller.id, user2_id=other_user_id)
+                    | Q(user1_id=other_user_id, user2_id=caller.id)
+                )
+                .order_by("id")
+                .first()
+            )
+            created = conversation is None
+            if created:
+                conversation = Conversation.objects.create(
+                    user1_id=caller.id,
+                    user2_id=other_user_id,
+                )
+
+        return chat_pb2.CreateConversationResponse(
+            conversation=conversation_to_pb(
+                conversation,
+                other_user,
+            ),
+            created=created,
+        )
+
+    @releases_db_connection
+    def GetConversations(self, request, context):
+        caller = authenticate(context)
+        conversations = (
+            Conversation.objects.with_participant(caller)
+            .select_related("user1", "user2")
+            .order_by("-created_at", "-id")
+        )
+
+        response = chat_pb2.GetConversationsResponse()
+        for conversation in conversations:
+            other_user = (
+                conversation.user2
+                if conversation.user1_id == caller.id
+                else conversation.user1
+            )
+            response.conversations.add().CopyFrom(
+                conversation_to_pb(conversation, other_user)
+            )
         return response
 
     @releases_db_connection

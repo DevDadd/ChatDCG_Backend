@@ -59,6 +59,16 @@ class ChatServiceStub:
                 request_serializer=chat__pb2.GetConversationHistoryRequest.SerializeToString,
                 response_deserializer=chat__pb2.GetConversationHistoryResponse.FromString,
                 _registered_method=True)
+        self.CreateConversation = channel.unary_unary(
+                '/chat.ChatService/CreateConversation',
+                request_serializer=chat__pb2.CreateConversationRequest.SerializeToString,
+                response_deserializer=chat__pb2.CreateConversationResponse.FromString,
+                _registered_method=True)
+        self.GetConversations = channel.unary_unary(
+                '/chat.ChatService/GetConversations',
+                request_serializer=chat__pb2.GetConversationsRequest.SerializeToString,
+                response_deserializer=chat__pb2.GetConversationsResponse.FromString,
+                _registered_method=True)
         self.SendMessage = channel.unary_unary(
                 '/chat.ChatService/SendMessage',
                 request_serializer=chat__pb2.SendMessageRequest.SerializeToString,
@@ -126,6 +136,18 @@ class ChatServiceServicer:
         raise NotImplementedError('Method not implemented!')
 
     def GetConversationHistory(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CreateConversation(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetConversations(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -203,6 +225,16 @@ def add_ChatServiceServicer_to_server(servicer, server):
                     servicer.GetConversationHistory,
                     request_deserializer=chat__pb2.GetConversationHistoryRequest.FromString,
                     response_serializer=chat__pb2.GetConversationHistoryResponse.SerializeToString,
+            ),
+            'CreateConversation': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateConversation,
+                    request_deserializer=chat__pb2.CreateConversationRequest.FromString,
+                    response_serializer=chat__pb2.CreateConversationResponse.SerializeToString,
+            ),
+            'GetConversations': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetConversations,
+                    request_deserializer=chat__pb2.GetConversationsRequest.FromString,
+                    response_serializer=chat__pb2.GetConversationsResponse.SerializeToString,
             ),
             'SendMessage': grpc.unary_unary_rpc_method_handler(
                     servicer.SendMessage,
@@ -375,6 +407,60 @@ class ChatService:
             '/chat.ChatService/GetConversationHistory',
             chat__pb2.GetConversationHistoryRequest.SerializeToString,
             chat__pb2.GetConversationHistoryResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def CreateConversation(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/chat.ChatService/CreateConversation',
+            chat__pb2.CreateConversationRequest.SerializeToString,
+            chat__pb2.CreateConversationResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetConversations(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/chat.ChatService/GetConversations',
+            chat__pb2.GetConversationsRequest.SerializeToString,
+            chat__pb2.GetConversationsResponse.FromString,
             options,
             channel_credentials,
             insecure,
