@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nchat.proto\x12\x04\x63hat\"\\\n\x0fRegisterRequest\x12\x0f\n\x07\x61\x63\x63ount\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\x12\x10\n\x08username\x18\x03 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x04 \x01(\t\"1\n\x0cLoginRequest\x12\x0f\n\x07\x61\x63\x63ount\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\"\x0f\n\rLogoutRequest\"!\n\x0eLogoutResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"O\n\x08UserInfo\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0f\n\x07\x61\x63\x63ount\x18\x02 \x01(\t\x12\x10\n\x08username\x18\x03 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x04 \x01(\t\",\n\x0c\x41uthResponse\x12\x1c\n\x04user\x18\x01 \x01(\x0b\x32\x0e.chat.UserInfo\"\x17\n\x15GetUsersStatusRequest\"k\n\nUserStatus\x12\x0f\n\x07user_id\x18\x01 \x01(\x03\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x03 \x01(\t\x12\x11\n\tis_online\x18\x04 \x01(\x08\x12\x11\n\tlast_seen\x18\x05 \x01(\t\"9\n\x16GetUsersStatusResponse\x12\x1f\n\x05users\x18\x01 \x03(\x0b\x32\x10.chat.UserStatus\"6\n\x1dGetConversationHistoryRequest\x12\x15\n\rother_user_id\x18\x01 \x01(\x03\"Z\n\x1eGetConversationHistoryResponse\x12#\n\x08messages\x18\x01 \x03(\x0b\x32\x11.chat.ChatMessage\x12\x13\n\x0btotal_count\x18\x02 \x01(\x05\"n\n\x12SendMessageRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x11\n\tsender_id\x18\x02 \x01(\x03\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\x12\x1b\n\x13\x63lient_timestamp_ms\x18\x04 \x01(\x03\"K\n\x13SendMessageResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x12\n\nmessage_id\x18\x03 \x01(\x03\"V\n\x17SendTypingStatusRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x0f\n\x07user_id\x18\x02 \x01(\x03\x12\x11\n\tis_typing\x18\x03 \x01(\x08\"+\n\x18SendTypingStatusResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"B\n\x16SubscribeTypingRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x0f\n\x07user_id\x18\x02 \x01(\x03\"\x85\x01\n\x0bTypingEvent\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x0f\n\x07user_id\x18\x02 \x01(\x03\x12\x10\n\x08username\x18\x03 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x04 \x01(\t\x12\x11\n\tis_typing\x18\x05 \x01(\x08\x12\x11\n\ttimestamp\x18\x06 \x01(\t\"\x86\x01\n\x0b\x43hatMessage\x12\x12\n\nmessage_id\x18\x01 \x01(\x03\x12\x17\n\x0f\x63onversation_id\x18\x02 \x01(\x03\x12\x11\n\tsender_id\x18\x03 \x01(\x03\x12\x13\n\x0bsender_name\x18\x04 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x05 \x01(\t\x12\x11\n\ttimestamp\x18\x06 \x01(\t\"A\n\x15StreamMessagesRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x0f\n\x07user_id\x18\x02 \x01(\x03\"U\n\x14SyncMessagesResponse\x12\x16\n\x0ereceived_count\x18\x01 \x01(\x05\x12\x14\n\x0c\x66\x61iled_count\x18\x02 \x01(\x05\x12\x0f\n\x07message\x18\x03 \x01(\t\"P\n\x11\x43hatClientMessage\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x11\n\tsender_id\x18\x02 \x01(\x03\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\"\x11\n\x0fPresenceRequest\"F\n\rPresenceEvent\x12\x0f\n\x07user_id\x18\x01 \x01(\x03\x12\x11\n\tis_online\x18\x02 \x01(\x08\x12\x11\n\tlast_seen\x18\x03 \x01(\t2\xb7\x06\n\x0b\x43hatService\x12\x35\n\x08Register\x12\x15.chat.RegisterRequest\x1a\x12.chat.AuthResponse\x12/\n\x05Login\x12\x12.chat.LoginRequest\x1a\x12.chat.AuthResponse\x12\x33\n\x06Logout\x12\x13.chat.LogoutRequest\x1a\x14.chat.LogoutResponse\x12K\n\x0eGetUsersStatus\x12\x1b.chat.GetUsersStatusRequest\x1a\x1c.chat.GetUsersStatusResponse\x12\x63\n\x16GetConversationHistory\x12#.chat.GetConversationHistoryRequest\x1a$.chat.GetConversationHistoryResponse\x12\x42\n\x0bSendMessage\x12\x18.chat.SendMessageRequest\x1a\x19.chat.SendMessageResponse\x12Q\n\x10SendTypingStatus\x12\x1d.chat.SendTypingStatusRequest\x1a\x1e.chat.SendTypingStatusResponse\x12\x44\n\x0fSubscribeTyping\x12\x1c.chat.SubscribeTypingRequest\x1a\x11.chat.TypingEvent0\x01\x12\x42\n\x0eStreamMessages\x12\x1b.chat.StreamMessagesRequest\x1a\x11.chat.ChatMessage0\x01\x12\x46\n\x0cSyncMessages\x12\x18.chat.SendMessageRequest\x1a\x1a.chat.SyncMessagesResponse(\x01\x12\x36\n\x04\x43hat\x12\x17.chat.ChatClientMessage\x1a\x11.chat.ChatMessage(\x01\x30\x01\x12\x38\n\x08Presence\x12\x15.chat.PresenceRequest\x1a\x13.chat.PresenceEvent0\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nchat.proto\x12\x04\x63hat\"\\\n\x0fRegisterRequest\x12\x0f\n\x07\x61\x63\x63ount\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\x12\x10\n\x08username\x18\x03 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x04 \x01(\t\"1\n\x0cLoginRequest\x12\x0f\n\x07\x61\x63\x63ount\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\"\x0f\n\rLogoutRequest\"!\n\x0eLogoutResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"O\n\x08UserInfo\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0f\n\x07\x61\x63\x63ount\x18\x02 \x01(\t\x12\x10\n\x08username\x18\x03 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x04 \x01(\t\",\n\x0c\x41uthResponse\x12\x1c\n\x04user\x18\x01 \x01(\x0b\x32\x0e.chat.UserInfo\"\x17\n\x15GetUsersStatusRequest\"k\n\nUserStatus\x12\x0f\n\x07user_id\x18\x01 \x01(\x03\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x03 \x01(\t\x12\x11\n\tis_online\x18\x04 \x01(\x08\x12\x11\n\tlast_seen\x18\x05 \x01(\t\"9\n\x16GetUsersStatusResponse\x12\x1f\n\x05users\x18\x01 \x03(\x0b\x32\x10.chat.UserStatus\"6\n\x1dGetConversationHistoryRequest\x12\x15\n\rother_user_id\x18\x01 \x01(\x03\"Z\n\x1eGetConversationHistoryResponse\x12#\n\x08messages\x18\x01 \x03(\x0b\x32\x11.chat.ChatMessage\x12\x13\n\x0btotal_count\x18\x02 \x01(\x05\"2\n\x19\x43reateConversationRequest\x12\x15\n\rother_user_id\x18\x01 \x01(\x03\"[\n\x1a\x43reateConversationResponse\x12,\n\x0c\x63onversation\x18\x01 \x01(\x0b\x32\x16.chat.ConversationInfo\x12\x0f\n\x07\x63reated\x18\x02 \x01(\x08\"\x19\n\x17GetConversationsRequest\"I\n\x18GetConversationsResponse\x12-\n\rconversations\x18\x01 \x03(\x0b\x32\x16.chat.ConversationInfo\"c\n\x10\x43onversationInfo\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\"\n\nother_user\x18\x02 \x01(\x0b\x32\x0e.chat.UserInfo\x12\x12\n\ncreated_at\x18\x03 \x01(\t\"n\n\x12SendMessageRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x11\n\tsender_id\x18\x02 \x01(\x03\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\x12\x1b\n\x13\x63lient_timestamp_ms\x18\x04 \x01(\x03\"K\n\x13SendMessageResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x12\n\nmessage_id\x18\x03 \x01(\x03\"V\n\x17SendTypingStatusRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x0f\n\x07user_id\x18\x02 \x01(\x03\x12\x11\n\tis_typing\x18\x03 \x01(\x08\"+\n\x18SendTypingStatusResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"B\n\x16SubscribeTypingRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x0f\n\x07user_id\x18\x02 \x01(\x03\"\x85\x01\n\x0bTypingEvent\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x0f\n\x07user_id\x18\x02 \x01(\x03\x12\x10\n\x08username\x18\x03 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x04 \x01(\t\x12\x11\n\tis_typing\x18\x05 \x01(\x08\x12\x11\n\ttimestamp\x18\x06 \x01(\t\"\x86\x01\n\x0b\x43hatMessage\x12\x12\n\nmessage_id\x18\x01 \x01(\x03\x12\x17\n\x0f\x63onversation_id\x18\x02 \x01(\x03\x12\x11\n\tsender_id\x18\x03 \x01(\x03\x12\x13\n\x0bsender_name\x18\x04 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x05 \x01(\t\x12\x11\n\ttimestamp\x18\x06 \x01(\t\"A\n\x15StreamMessagesRequest\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x0f\n\x07user_id\x18\x02 \x01(\x03\"U\n\x14SyncMessagesResponse\x12\x16\n\x0ereceived_count\x18\x01 \x01(\x05\x12\x14\n\x0c\x66\x61iled_count\x18\x02 \x01(\x05\x12\x0f\n\x07message\x18\x03 \x01(\t\"P\n\x11\x43hatClientMessage\x12\x17\n\x0f\x63onversation_id\x18\x01 \x01(\x03\x12\x11\n\tsender_id\x18\x02 \x01(\x03\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\"\x11\n\x0fPresenceRequest\"F\n\rPresenceEvent\x12\x0f\n\x07user_id\x18\x01 \x01(\x03\x12\x11\n\tis_online\x18\x02 \x01(\x08\x12\x11\n\tlast_seen\x18\x03 \x01(\t2\xe3\x07\n\x0b\x43hatService\x12\x35\n\x08Register\x12\x15.chat.RegisterRequest\x1a\x12.chat.AuthResponse\x12/\n\x05Login\x12\x12.chat.LoginRequest\x1a\x12.chat.AuthResponse\x12\x33\n\x06Logout\x12\x13.chat.LogoutRequest\x1a\x14.chat.LogoutResponse\x12K\n\x0eGetUsersStatus\x12\x1b.chat.GetUsersStatusRequest\x1a\x1c.chat.GetUsersStatusResponse\x12\x63\n\x16GetConversationHistory\x12#.chat.GetConversationHistoryRequest\x1a$.chat.GetConversationHistoryResponse\x12W\n\x12\x43reateConversation\x12\x1f.chat.CreateConversationRequest\x1a .chat.CreateConversationResponse\x12Q\n\x10GetConversations\x12\x1d.chat.GetConversationsRequest\x1a\x1e.chat.GetConversationsResponse\x12\x42\n\x0bSendMessage\x12\x18.chat.SendMessageRequest\x1a\x19.chat.SendMessageResponse\x12Q\n\x10SendTypingStatus\x12\x1d.chat.SendTypingStatusRequest\x1a\x1e.chat.SendTypingStatusResponse\x12\x44\n\x0fSubscribeTyping\x12\x1c.chat.SubscribeTypingRequest\x1a\x11.chat.TypingEvent0\x01\x12\x42\n\x0eStreamMessages\x12\x1b.chat.StreamMessagesRequest\x1a\x11.chat.ChatMessage0\x01\x12\x46\n\x0cSyncMessages\x12\x18.chat.SendMessageRequest\x1a\x1a.chat.SyncMessagesResponse(\x01\x12\x36\n\x04\x43hat\x12\x17.chat.ChatClientMessage\x1a\x11.chat.ChatMessage(\x01\x30\x01\x12\x38\n\x08Presence\x12\x15.chat.PresenceRequest\x1a\x13.chat.PresenceEvent0\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -53,30 +53,40 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_GETCONVERSATIONHISTORYREQUEST']._serialized_end=591
   _globals['_GETCONVERSATIONHISTORYRESPONSE']._serialized_start=593
   _globals['_GETCONVERSATIONHISTORYRESPONSE']._serialized_end=683
-  _globals['_SENDMESSAGEREQUEST']._serialized_start=685
-  _globals['_SENDMESSAGEREQUEST']._serialized_end=795
-  _globals['_SENDMESSAGERESPONSE']._serialized_start=797
-  _globals['_SENDMESSAGERESPONSE']._serialized_end=872
-  _globals['_SENDTYPINGSTATUSREQUEST']._serialized_start=874
-  _globals['_SENDTYPINGSTATUSREQUEST']._serialized_end=960
-  _globals['_SENDTYPINGSTATUSRESPONSE']._serialized_start=962
-  _globals['_SENDTYPINGSTATUSRESPONSE']._serialized_end=1005
-  _globals['_SUBSCRIBETYPINGREQUEST']._serialized_start=1007
-  _globals['_SUBSCRIBETYPINGREQUEST']._serialized_end=1073
-  _globals['_TYPINGEVENT']._serialized_start=1076
-  _globals['_TYPINGEVENT']._serialized_end=1209
-  _globals['_CHATMESSAGE']._serialized_start=1212
-  _globals['_CHATMESSAGE']._serialized_end=1346
-  _globals['_STREAMMESSAGESREQUEST']._serialized_start=1348
-  _globals['_STREAMMESSAGESREQUEST']._serialized_end=1413
-  _globals['_SYNCMESSAGESRESPONSE']._serialized_start=1415
-  _globals['_SYNCMESSAGESRESPONSE']._serialized_end=1500
-  _globals['_CHATCLIENTMESSAGE']._serialized_start=1502
-  _globals['_CHATCLIENTMESSAGE']._serialized_end=1582
-  _globals['_PRESENCEREQUEST']._serialized_start=1584
-  _globals['_PRESENCEREQUEST']._serialized_end=1601
-  _globals['_PRESENCEEVENT']._serialized_start=1603
-  _globals['_PRESENCEEVENT']._serialized_end=1673
-  _globals['_CHATSERVICE']._serialized_start=1676
-  _globals['_CHATSERVICE']._serialized_end=2499
+  _globals['_CREATECONVERSATIONREQUEST']._serialized_start=685
+  _globals['_CREATECONVERSATIONREQUEST']._serialized_end=735
+  _globals['_CREATECONVERSATIONRESPONSE']._serialized_start=737
+  _globals['_CREATECONVERSATIONRESPONSE']._serialized_end=828
+  _globals['_GETCONVERSATIONSREQUEST']._serialized_start=830
+  _globals['_GETCONVERSATIONSREQUEST']._serialized_end=855
+  _globals['_GETCONVERSATIONSRESPONSE']._serialized_start=857
+  _globals['_GETCONVERSATIONSRESPONSE']._serialized_end=930
+  _globals['_CONVERSATIONINFO']._serialized_start=932
+  _globals['_CONVERSATIONINFO']._serialized_end=1031
+  _globals['_SENDMESSAGEREQUEST']._serialized_start=1033
+  _globals['_SENDMESSAGEREQUEST']._serialized_end=1143
+  _globals['_SENDMESSAGERESPONSE']._serialized_start=1145
+  _globals['_SENDMESSAGERESPONSE']._serialized_end=1220
+  _globals['_SENDTYPINGSTATUSREQUEST']._serialized_start=1222
+  _globals['_SENDTYPINGSTATUSREQUEST']._serialized_end=1308
+  _globals['_SENDTYPINGSTATUSRESPONSE']._serialized_start=1310
+  _globals['_SENDTYPINGSTATUSRESPONSE']._serialized_end=1353
+  _globals['_SUBSCRIBETYPINGREQUEST']._serialized_start=1355
+  _globals['_SUBSCRIBETYPINGREQUEST']._serialized_end=1421
+  _globals['_TYPINGEVENT']._serialized_start=1424
+  _globals['_TYPINGEVENT']._serialized_end=1557
+  _globals['_CHATMESSAGE']._serialized_start=1560
+  _globals['_CHATMESSAGE']._serialized_end=1694
+  _globals['_STREAMMESSAGESREQUEST']._serialized_start=1696
+  _globals['_STREAMMESSAGESREQUEST']._serialized_end=1761
+  _globals['_SYNCMESSAGESRESPONSE']._serialized_start=1763
+  _globals['_SYNCMESSAGESRESPONSE']._serialized_end=1848
+  _globals['_CHATCLIENTMESSAGE']._serialized_start=1850
+  _globals['_CHATCLIENTMESSAGE']._serialized_end=1930
+  _globals['_PRESENCEREQUEST']._serialized_start=1932
+  _globals['_PRESENCEREQUEST']._serialized_end=1949
+  _globals['_PRESENCEEVENT']._serialized_start=1951
+  _globals['_PRESENCEEVENT']._serialized_end=2021
+  _globals['_CHATSERVICE']._serialized_start=2024
+  _globals['_CHATSERVICE']._serialized_end=3019
 # @@protoc_insertion_point(module_scope)

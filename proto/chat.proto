@@ -22,6 +22,12 @@ service ChatService {
   rpc GetConversationHistory (GetConversationHistoryRequest)
       returns (GetConversationHistoryResponse);
 
+  rpc CreateConversation (CreateConversationRequest)
+      returns (CreateConversationResponse);
+
+  rpc GetConversations (GetConversationsRequest)
+      returns (GetConversationsResponse);
+
   rpc SendMessage (SendMessageRequest)
       returns (SendMessageResponse);
 
@@ -101,6 +107,28 @@ message GetConversationHistoryRequest {
 message GetConversationHistoryResponse {
   repeated ChatMessage messages = 1;
   int32 total_count = 2;
+}
+
+message CreateConversationRequest {
+  int64 other_user_id = 1;
+}
+
+message CreateConversationResponse {
+  ConversationInfo conversation = 1;
+  bool created = 2;
+}
+
+message GetConversationsRequest {
+}
+
+message GetConversationsResponse {
+  repeated ConversationInfo conversations = 1;
+}
+
+message ConversationInfo {
+  int64 conversation_id = 1;
+  UserInfo other_user = 2;
+  string created_at = 3;
 }
 
 message SendMessageRequest {
