@@ -99,6 +99,38 @@ def test_get_conversation_history(stub, caller_id, other_user_id):
     print('  PASS')
 
 
+def test_get_conversation_history_by_id(stub, conv_id, caller_id):
+    print('\n=== GetConversationHistory by conversation_id (unary) ===')
+    resp = stub.GetConversationHistory(
+        chat_pb2.GetConversationHistoryRequest(
+            conversation_id=conv_id,
+        ),
+        metadata=meta(caller_id),
+        timeout=TIMEOUT,
+    )
+    print(f'  conversation_id={resp.conversation_id} total_count={resp.total_count} returned={len(resp.messages)}')
+    assert resp.conversation_id == conv_id, 'response conversation_id phải khớp'
+    assert resp.total_count == len(resp.messages), 'total_count phải bằng số messages trả về'
+    print('  PASS')
+
+
+def test_get_conversation_history_auto_create(stub, caller_id, other_user_id):
+    print('\n=== GetConversationHistory auto-create (unary) ===')
+    resp = stub.GetConversationHistory(
+        chat_pb2.GetConversationHistoryRequest(
+            conversation_id=0,
+            other_user_id=other_user_id,
+        ),
+        metadata=meta(caller_id),
+        timeout=TIMEOUT,
+    )
+    print(f'  conversation_id={resp.conversation_id} total_count={resp.total_count} returned={len(resp.messages)}')
+    assert resp.conversation_id != 0, 'phải trả về conversation_id mới tạo'
+    assert resp.total_count == 0, 'cuộc trò chuyện mới không có tin nhắn'
+    assert resp.total_count == len(resp.messages), 'total_count phải bằng số messages trả về'
+    print('  PASS')
+
+
 def test_send_and_stream(stub, conv_id, alice_id, bob_id):
     print('\n=== SendMessage + StreamMessages (server streaming) ===')
     received = []
@@ -191,11 +223,14 @@ def main():
 
         alice = register_or_login(stub, 'alice_test', 'alice-pass', 'Alice')
         bob = register_or_login(stub, 'bob_test', 'bob-pass', 'Bob')
+        charlie = register_or_login(stub, 'charlie_test', 'charlie-pass', 'Charlie')
         conv_id = ensure_conversation(alice.id, bob.id)
         print(f'Using conversation id={conv_id}')
 
         test_get_users_status(stub, alice.id)
         test_get_conversation_history(stub, alice.id, bob.id)
+        test_get_conversation_history_by_id(stub, conv_id, alice.id)
+        test_get_conversation_history_auto_create(stub, alice.id, charlie.id)
         test_send_and_stream(stub, conv_id, alice.id, bob.id)
         test_sync_messages(stub, conv_id, alice.id)
         test_chat(stub, conv_id, alice.id, bob.id)

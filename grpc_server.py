@@ -504,25 +504,48 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
     def GetConversationHistory(self, request, context):
         caller = authenticate(context)
 
+        conversation_id = request.conversation_id
         other_user_id = request.other_user_id
 
-        # Tìm conversation 1-1 giữa caller và other_user_id
-        conversation = (
-            Conversation.objects.filter(
-                Q(user1_id=caller.id, user2_id=other_user_id)
-                | Q(user1_id=other_user_id, user2_id=caller.id)
+        # Trường hợp 1: Có conversation_id cụ thể -> lấy lịch sử của cuộc đó
+        if conversation_id:
+            try:
+                conversation = Conversation.objects.get(id=conversation_id)
+            except Conversation.DoesNotExist:
+                context.abort(grpc.StatusCode.NOT_FOUND, "Conversation not found")
+
+            if caller.id not in (conversation.user1_id, conversation.user2_id):
+                context.abort(grpc.StatusCode.PERMISSION_DENIED, "Not a participant of this conversation")
+
+        # Trường hợp 2: conversation_id = 0 -> tìm existing hoặc tạo mới
+        else:
+            if not other_user_id:
+                context.abort(grpc.StatusCode.INVALID_ARGUMENT, "other_user_id is required when conversation_id is empty")
+
+            if other_user_id == caller.id:
+                context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Cannot create conversation with yourself")
+
+            # Kiểm tra other_user_id tồn tại
+            if not User.objects.filter(id=other_user_id).exists():
+                context.abort(grpc.StatusCode.NOT_FOUND, "User not found")
+
+            # Tìm existing conversation 1-1
+            conversation = (
+                Conversation.objects.filter(
+                    Q(user1_id=caller.id, user2_id=other_user_id)
+                    | Q(user1_id=other_user_id, user2_id=caller.id)
+                )
+                .first()
             )
-            .first()
-        )
 
-        response = chat_pb2.GetConversationHistoryResponse()
+            if conversation is None:
+                # Tạo mới conversation (side effect của RPC này)
+                conversation = Conversation.objects.create(
+                    user1_id=caller.id,
+                    user2_id=other_user_id,
+                )
 
-        if conversation is None:
-            # Chưa bao giờ có cuộc trò chuyện giữa 2 người -> trả về rỗng
-            response.total_count = 0
-            return response
-
-        # Lấy TOÀN BỘ tin nhắn, cũ -> mới, kèm sender để tránh N+1
+        # Lấy toàn bộ tin nhắn, cũ -> mới, kèm sender để tránh N+1
         messages = (
             Message.objects
             .filter(conversation_id=conversation.id)
@@ -530,6 +553,8 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
             .order_by("created_at")
         )
 
+        response = chat_pb2.GetConversationHistoryResponse()
+        response.conversation_id = conversation.id
         response.total_count = messages.count()
 
         for m in messages:
