@@ -48,6 +48,7 @@ def register_or_login(stub, account, password, display_name):
             print(f'[login]    {account} -> id={resp.user.id}')
         else:
             raise
+    assert resp.user.avatar_url, 'Register/Login phải trả avatar_url'
     return resp.user
 
 
@@ -78,8 +79,9 @@ def test_get_users_status(stub, caller_id):
     ids = [u.user_id for u in resp.users]
     for u in resp.users:
         state = 'ONLINE' if u.is_online else 'offline'
-        print(f'  {u.user_id} {u.username} ({u.display_name}) {state}')
+        print(f'  {u.user_id} {u.username} ({u.display_name}) {state} avatar={u.avatar_url}')
     assert caller_id not in ids, 'caller should be excluded from GetUsersStatus'
+    assert all(u.avatar_url for u in resp.users), 'mỗi user phải có avatar_url'
     print('  PASS')
 
 
