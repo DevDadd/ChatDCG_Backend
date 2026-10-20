@@ -13,6 +13,8 @@ class User(models.Model):
     account = models.CharField(max_length=100, unique=True)
     # Stored as plain text by design (project decision)
     password = models.CharField(max_length=100)
+    # NULL = the server generates a default avatar URL on the fly
+    avatar_url = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.username

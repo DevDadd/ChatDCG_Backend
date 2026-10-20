@@ -79,6 +79,7 @@ message UserInfo {
   string account = 2;
   string username = 3;
   string display_name = 4;
+  string avatar_url = 5;
 }
 
 message AuthResponse {
@@ -94,6 +95,7 @@ message UserStatus {
   string display_name = 3;
   bool is_online = 4;
   string last_seen = 5;
+  string avatar_url = 6;
 }
 
 message GetUsersStatusResponse {
@@ -101,8 +103,8 @@ message GetUsersStatusResponse {
 }
 
 message GetConversationHistoryRequest {
-  int64 conversation_id = 1;   // 0 = tự tạo cuộc hội thoại mới với other_user_id
-  int64 other_user_id = 2;     // bắt buộc khi conversation_id = 0
+  int64 other_user_id = 1;     // bắt buộc
+  int64 conversation_id = 2;   // 0 = tự tạo cuộc hội thoại mới với other_user_id
 }
 
 message GetConversationHistoryResponse {
