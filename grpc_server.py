@@ -7,7 +7,6 @@ from collections import defaultdict
 from concurrent import futures
 from contextlib import contextmanager
 from datetime import datetime, timezone as dt_timezone
-from urllib.parse import quote
 
 import django
 import grpc
@@ -333,15 +332,15 @@ def save_chat_message(caller, request):
     )
 
 
-def generated_avatar_url(name):
-    return f"https://api.dicebear.com/9.x/initials/svg?seed={quote(name)}"
+DEFAULT_AVATAR_URL = (
+    "https://encrypted-tbn0.gstatic.com/images"
+    "?q=tbn:ANd9GcRiRo5RsazUIy3LPn-DG57NPTKgVyRcUqqJODFRmkEdbg&s=10"
+)
 
 
 def default_avatar_url(user):
-    # Custom avatar stored in DB wins; otherwise generate a stable default
-    return user.avatar_url or generated_avatar_url(
-        user.display_name or user.username or user.account
-    )
+    # Custom avatar stored in DB wins; otherwise the shared default
+    return user.avatar_url or DEFAULT_AVATAR_URL
 
 
 def user_to_pb(user):
@@ -453,7 +452,7 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
                 password=password,
                 username=username,
                 display_name=display_name,
-                avatar_url=generated_avatar_url(display_name),
+                avatar_url=DEFAULT_AVATAR_URL,
             )
         except IntegrityError:
             # Lost a race with a concurrent registration
