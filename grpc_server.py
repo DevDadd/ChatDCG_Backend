@@ -706,58 +706,6 @@ class ChatService(chat_pb2_grpc.ChatServiceServicer):
                 typing_broker.unsubscribe(request.conversation_id, subscriber)
 
     @releases_db_connection
-    def SendMessage(self, request, context):
-        caller = authenticate(context)
-
-        with aborts_on_error(context):
-            check_claimed_user(caller, request.sender_id)
-            conversation = get_participant_conversation(
-                caller, request.conversation_id
-            )
-
-        message = Message.objects.create(
-            conversation=conversation,
-            sender=caller,
-            content=request.content,
-        )
-
-        message_broker.publish(conversation.id, message_to_pb(message, caller))
-
-        return chat_pb2.SendMessageResponse(
-            success=True,
-            message="Message sent",
-            message_id=message.id,
-        )
-
-    def StreamMessages(self, request, context):
-        with stream_slot(context):
-            try:
-                caller = authenticate(context)
-                with aborts_on_error(context):
-                    check_claimed_user(caller, request.user_id)
-                    get_participant_conversation(
-                        caller, request.conversation_id
-                    )
-            finally:
-                connection.close()
-
-            subscriber = Subscriber()
-            message_broker.subscribe(request.conversation_id, subscriber)
-
-            try:
-                with presence.connection(caller.id, context):
-                    # Don't echo the subscriber's own messages back to them
-                    yield from pump(
-                        context,
-                        subscriber,
-                        skip=lambda event: event.sender_id == caller.id,
-                    )
-            finally:
-                message_broker.unsubscribe(
-                    request.conversation_id, subscriber
-                )
-
-    @releases_db_connection
     def SyncMessages(self, request_iterator, context):
         # Client streaming: persist a batch of messages written offline in one
         # transaction, then publish them so online participants see them.
