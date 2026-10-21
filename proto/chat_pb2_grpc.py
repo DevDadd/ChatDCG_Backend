@@ -69,11 +69,6 @@ class ChatServiceStub:
                 request_serializer=chat__pb2.GetConversationsRequest.SerializeToString,
                 response_deserializer=chat__pb2.GetConversationsResponse.FromString,
                 _registered_method=True)
-        self.SendMessage = channel.unary_unary(
-                '/chat.ChatService/SendMessage',
-                request_serializer=chat__pb2.SendMessageRequest.SerializeToString,
-                response_deserializer=chat__pb2.SendMessageResponse.FromString,
-                _registered_method=True)
         self.SendTypingStatus = channel.unary_unary(
                 '/chat.ChatService/SendTypingStatus',
                 request_serializer=chat__pb2.SendTypingStatusRequest.SerializeToString,
@@ -83,11 +78,6 @@ class ChatServiceStub:
                 '/chat.ChatService/SubscribeTyping',
                 request_serializer=chat__pb2.SubscribeTypingRequest.SerializeToString,
                 response_deserializer=chat__pb2.TypingEvent.FromString,
-                _registered_method=True)
-        self.StreamMessages = channel.unary_stream(
-                '/chat.ChatService/StreamMessages',
-                request_serializer=chat__pb2.StreamMessagesRequest.SerializeToString,
-                response_deserializer=chat__pb2.ChatMessage.FromString,
                 _registered_method=True)
         self.SyncMessages = channel.stream_unary(
                 '/chat.ChatService/SyncMessages',
@@ -153,12 +143,6 @@ class ChatServiceServicer:
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def SendMessage(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def SendTypingStatus(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -166,12 +150,6 @@ class ChatServiceServicer:
         raise NotImplementedError('Method not implemented!')
 
     def SubscribeTyping(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def StreamMessages(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -236,11 +214,6 @@ def add_ChatServiceServicer_to_server(servicer, server):
                     request_deserializer=chat__pb2.GetConversationsRequest.FromString,
                     response_serializer=chat__pb2.GetConversationsResponse.SerializeToString,
             ),
-            'SendMessage': grpc.unary_unary_rpc_method_handler(
-                    servicer.SendMessage,
-                    request_deserializer=chat__pb2.SendMessageRequest.FromString,
-                    response_serializer=chat__pb2.SendMessageResponse.SerializeToString,
-            ),
             'SendTypingStatus': grpc.unary_unary_rpc_method_handler(
                     servicer.SendTypingStatus,
                     request_deserializer=chat__pb2.SendTypingStatusRequest.FromString,
@@ -250,11 +223,6 @@ def add_ChatServiceServicer_to_server(servicer, server):
                     servicer.SubscribeTyping,
                     request_deserializer=chat__pb2.SubscribeTypingRequest.FromString,
                     response_serializer=chat__pb2.TypingEvent.SerializeToString,
-            ),
-            'StreamMessages': grpc.unary_stream_rpc_method_handler(
-                    servicer.StreamMessages,
-                    request_deserializer=chat__pb2.StreamMessagesRequest.FromString,
-                    response_serializer=chat__pb2.ChatMessage.SerializeToString,
             ),
             'SyncMessages': grpc.stream_unary_rpc_method_handler(
                     servicer.SyncMessages,
@@ -472,33 +440,6 @@ class ChatService:
             _registered_method=True)
 
     @staticmethod
-    def SendMessage(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/chat.ChatService/SendMessage',
-            chat__pb2.SendMessageRequest.SerializeToString,
-            chat__pb2.SendMessageResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
     def SendTypingStatus(request,
             target,
             options=(),
@@ -542,33 +483,6 @@ class ChatService:
             '/chat.ChatService/SubscribeTyping',
             chat__pb2.SubscribeTypingRequest.SerializeToString,
             chat__pb2.TypingEvent.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def StreamMessages(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_stream(
-            request,
-            target,
-            '/chat.ChatService/StreamMessages',
-            chat__pb2.StreamMessagesRequest.SerializeToString,
-            chat__pb2.ChatMessage.FromString,
             options,
             channel_credentials,
             insecure,

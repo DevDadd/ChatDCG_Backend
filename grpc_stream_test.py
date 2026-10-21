@@ -1,6 +1,6 @@
-# End-to-end test for the deployed ChatService.
-# Covers the 4 gRPC types: unary (SendMessage), server stream (StreamMessages),
-# client stream (SyncMessages), bidirectional (Chat), plus Register/Login.
+﻿# End-to-end test for the deployed ChatService.
+# Covers: unary (GetUsersStatus, GetConversationHistory), client stream (SyncMessages),
+# bidirectional (Chat), plus Register/Login.
 # Local:   python grpc_stream_test.py
 # Railway: set GRPC_TEST_TARGET=iriguchi.proxy.rlwy.net:51141  then run
 import os
@@ -48,7 +48,7 @@ def register_or_login(stub, account, password, display_name):
             print(f'[login]    {account} -> id={resp.user.id}')
         else:
             raise
-    assert resp.user.avatar_url, 'Register/Login phải trả avatar_url'
+    assert resp.user.avatar_url, 'Register/Login must return avatar_url'
     return resp.user
 
 
@@ -81,7 +81,7 @@ def test_get_users_status(stub, caller_id):
         state = 'ONLINE' if u.is_online else 'offline'
         print(f'  {u.user_id} {u.username} ({u.display_name}) {state} avatar={u.avatar_url}')
     assert caller_id not in ids, 'caller should be excluded from GetUsersStatus'
-    assert all(u.avatar_url for u in resp.users), 'mỗi user phải có avatar_url'
+    assert all(u.avatar_url for u in resp.users), 'every user must have avatar_url'
     print('  PASS')
 
 
@@ -97,7 +97,7 @@ def test_get_conversation_history(stub, caller_id, other_user_id):
     print(f'  total_count={resp.total_count} returned={len(resp.messages)}')
     for m in resp.messages:
         print(f'  [{m.message_id}] {m.sender_name}: {m.content} ({m.timestamp})')
-    assert resp.total_count == len(resp.messages), 'total_count phải bằng số messages trả về'
+    assert resp.total_count == len(resp.messages), 'total_count must equal number of messages returned'
     print('  PASS')
 
 
@@ -111,8 +111,8 @@ def test_get_conversation_history_by_id(stub, conv_id, caller_id):
         timeout=TIMEOUT,
     )
     print(f'  conversation_id={resp.conversation_id} total_count={resp.total_count} returned={len(resp.messages)}')
-    assert resp.conversation_id == conv_id, 'response conversation_id phải khớp'
-    assert resp.total_count == len(resp.messages), 'total_count phải bằng số messages trả về'
+    assert resp.conversation_id == conv_id, 'response conversation_id must match'
+    assert resp.total_count == len(resp.messages), 'total_count must equal number of messages returned'
     print('  PASS')
 
 
@@ -127,39 +127,9 @@ def test_get_conversation_history_auto_create(stub, caller_id, other_user_id):
         timeout=TIMEOUT,
     )
     print(f'  conversation_id={resp.conversation_id} total_count={resp.total_count} returned={len(resp.messages)}')
-    assert resp.conversation_id != 0, 'phải trả về conversation_id mới tạo'
-    assert resp.total_count == 0, 'cuộc trò chuyện mới không có tin nhắn'
-    assert resp.total_count == len(resp.messages), 'total_count phải bằng số messages trả về'
-    print('  PASS')
-
-
-def test_send_and_stream(stub, conv_id, alice_id, bob_id):
-    print('\n=== SendMessage + StreamMessages (server streaming) ===')
-    received = []
-
-    def listen():
-        try:
-            for msg in stub.StreamMessages(
-                chat_pb2.StreamMessagesRequest(conversation_id=conv_id),
-                metadata=meta(bob_id),
-            ):
-                received.append(msg)
-                print(f'  [bob via StreamMessages] {msg.sender_name}: {msg.content}')
-        except grpc.RpcError as e:
-            print(f'  [stream ended] {e.code()}')
-
-    threading.Thread(target=listen, daemon=True).start()
-    time.sleep(0.5)
-
-    stub.SendMessage(
-        chat_pb2.SendMessageRequest(
-            conversation_id=conv_id, sender_id=0, content='hello from alice'
-        ),
-        metadata=meta(alice_id),
-        timeout=TIMEOUT,
-    )
-    time.sleep(1.0)
-    assert any(m.content == 'hello from alice' for m in received), 'bob did not receive alice message via StreamMessages'
+    assert resp.conversation_id != 0, 'must return newly created conversation_id'
+    assert resp.total_count == 0, 'new conversation must have no messages'
+    assert resp.total_count == len(resp.messages), 'total_count must equal number of messages returned'
     print('  PASS')
 
 
@@ -180,9 +150,24 @@ def test_sync_messages(stub, conv_id, alice_id):
 
 def test_chat(stub, conv_id, alice_id, bob_id):
     print('\n=== Chat (bidirectional streaming) ===')
-    received = []
+    alice_received = []
+    bob_received = []
 
-    def bob_stream():
+    def chat_collect(user_id, out_msgs, into):
+        stream = stub.Chat(out_msgs, metadata=meta(user_id))
+        for msg in stream:
+            into.append(msg)
+            print(f'  [{user_id} via Chat] {msg.sender_name}: {msg.content}')
+
+    def alice_out():
+        time.sleep(0.6)
+        for i in range(2):
+            yield chat_pb2.ChatClientMessage(
+                conversation_id=conv_id, sender_id=0, content=f'alice-{i}'
+            )
+            time.sleep(0.4)
+
+    def bob_out():
         for i in range(2):
             yield chat_pb2.ChatClientMessage(
                 conversation_id=conv_id, sender_id=0, content=f'bob-bidi-{i}'
@@ -190,31 +175,23 @@ def test_chat(stub, conv_id, alice_id, bob_id):
             time.sleep(0.3)
         time.sleep(1.5)
 
-    def alice_sends():
-        time.sleep(0.6)
-        for i in range(2):
-            stub.SendMessage(
-                chat_pb2.SendMessageRequest(
-                    conversation_id=conv_id, sender_id=0, content=f'alice-{i}'
-                ),
-                metadata=meta(alice_id),
-                timeout=TIMEOUT,
-            )
-            time.sleep(0.4)
+    t_alice = threading.Thread(
+        target=lambda: chat_collect(alice_id, alice_out(), alice_received), daemon=True
+    )
+    t_bob = threading.Thread(
+        target=lambda: chat_collect(bob_id, bob_out(), bob_received), daemon=True
+    )
+    t_alice.start()
+    t_bob.start()
+    t_alice.join(timeout=10)
+    t_bob.join(timeout=10)
 
-    threading.Thread(target=alice_sends, daemon=True).start()
-
-    stream = stub.Chat(bob_stream(), metadata=meta(bob_id))
-    deadline = time.time() + 3
-    for msg in stream:
-        received.append(msg)
-        print(f'  [bob via Chat] {msg.sender_name}: {msg.content}')
-        if time.time() > deadline:
-            break
-    stream.cancel()
-
-    assert any(m.content.startswith('alice-') for m in received), 'bob did not receive alice messages over Chat'
-    assert not any(m.content.startswith('bob-bidi-') for m in received), 'bob received his own messages (self-echo bug)'
+    alice_contents = [m.content for m in alice_received]
+    bob_contents = [m.content for m in bob_received]
+    assert any(c.startswith('bob-bidi-') for c in alice_contents), 'alice did not receive bob messages over Chat'
+    assert any(c.startswith('alice-') for c in bob_contents), 'bob did not receive alice messages over Chat'
+    assert not any(c.startswith('alice-') for c in alice_contents), 'alice received her own messages (self-echo bug)'
+    assert not any(c.startswith('bob-bidi-') for c in bob_contents), 'bob received his own messages (self-echo bug)'
     print('  PASS')
 
 
@@ -233,7 +210,6 @@ def main():
         test_get_conversation_history(stub, alice.id, bob.id)
         test_get_conversation_history_by_id(stub, conv_id, alice.id)
         test_get_conversation_history_auto_create(stub, alice.id, charlie.id)
-        test_send_and_stream(stub, conv_id, alice.id, bob.id)
         test_sync_messages(stub, conv_id, alice.id)
         test_chat(stub, conv_id, alice.id, bob.id)
 
@@ -242,3 +218,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

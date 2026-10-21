@@ -28,17 +28,11 @@ service ChatService {
   rpc GetConversations (GetConversationsRequest)
       returns (GetConversationsResponse);
 
-  rpc SendMessage (SendMessageRequest)
-      returns (SendMessageResponse);
-
   rpc SendTypingStatus (SendTypingStatusRequest)
       returns (SendTypingStatusResponse);
 
   rpc SubscribeTyping (SubscribeTypingRequest)
       returns (stream TypingEvent);
-
-  rpc StreamMessages (StreamMessagesRequest)
-      returns (stream ChatMessage);
 
   rpc SyncMessages (stream SendMessageRequest)
       returns (SyncMessagesResponse);
@@ -144,12 +138,6 @@ message SendMessageRequest {
   int64 client_timestamp_ms = 4;
 }
 
-message SendMessageResponse {
-  bool success = 1;
-  string message = 2;
-  int64 message_id = 3;
-}
-
 message SendTypingStatusRequest {
   int64 conversation_id = 1;
   int64 user_id = 2;
@@ -181,11 +169,6 @@ message ChatMessage {
   string sender_name = 4;
   string content = 5;
   string timestamp = 6;
-}
-
-message StreamMessagesRequest {
-  int64 conversation_id = 1;
-  int64 user_id = 2;
 }
 
 message SyncMessagesResponse {
