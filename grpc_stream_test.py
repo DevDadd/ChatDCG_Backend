@@ -48,7 +48,7 @@ def register_or_login(stub, account, password, display_name):
             print(f'[login]    {account} -> id={resp.user.id}')
         else:
             raise
-    assert resp.user.avatar_url, 'Register/Login pháº£i tráº£ avatar_url'
+    assert resp.user.avatar_url, 'Register/Login must return avatar_url'
     return resp.user
 
 
@@ -81,7 +81,7 @@ def test_get_users_status(stub, caller_id):
         state = 'ONLINE' if u.is_online else 'offline'
         print(f'  {u.user_id} {u.username} ({u.display_name}) {state} avatar={u.avatar_url}')
     assert caller_id not in ids, 'caller should be excluded from GetUsersStatus'
-    assert all(u.avatar_url for u in resp.users), 'má»—i user pháº£i cÃ³ avatar_url'
+    assert all(u.avatar_url for u in resp.users), 'every user must have avatar_url'
     print('  PASS')
 
 
@@ -97,7 +97,7 @@ def test_get_conversation_history(stub, caller_id, other_user_id):
     print(f'  total_count={resp.total_count} returned={len(resp.messages)}')
     for m in resp.messages:
         print(f'  [{m.message_id}] {m.sender_name}: {m.content} ({m.timestamp})')
-    assert resp.total_count == len(resp.messages), 'total_count pháº£i báº±ng sá»‘ messages tráº£ vá»'
+    assert resp.total_count == len(resp.messages), 'total_count must equal number of messages returned'
     print('  PASS')
 
 
@@ -111,8 +111,8 @@ def test_get_conversation_history_by_id(stub, conv_id, caller_id):
         timeout=TIMEOUT,
     )
     print(f'  conversation_id={resp.conversation_id} total_count={resp.total_count} returned={len(resp.messages)}')
-    assert resp.conversation_id == conv_id, 'response conversation_id pháº£i khá»›p'
-    assert resp.total_count == len(resp.messages), 'total_count pháº£i báº±ng sá»‘ messages tráº£ vá»'
+    assert resp.conversation_id == conv_id, 'response conversation_id must match'
+    assert resp.total_count == len(resp.messages), 'total_count must equal number of messages returned'
     print('  PASS')
 
 
@@ -127,9 +127,9 @@ def test_get_conversation_history_auto_create(stub, caller_id, other_user_id):
         timeout=TIMEOUT,
     )
     print(f'  conversation_id={resp.conversation_id} total_count={resp.total_count} returned={len(resp.messages)}')
-    assert resp.conversation_id != 0, 'pháº£i tráº£ vá» conversation_id má»›i táº¡o'
-    assert resp.total_count == 0, 'cuá»™c trÃ² chuyá»‡n má»›i khÃ´ng cÃ³ tin nháº¯n'
-    assert resp.total_count == len(resp.messages), 'total_count pháº£i báº±ng sá»‘ messages tráº£ vá»'
+    assert resp.conversation_id != 0, 'must return newly created conversation_id'
+    assert resp.total_count == 0, 'new conversation must have no messages'
+    assert resp.total_count == len(resp.messages), 'total_count must equal number of messages returned'
     print('  PASS')
 
 
